@@ -3,6 +3,9 @@
 import yaml
 import tasks
 import sys
+import argparse
+import os
+
 class color:
   PURPLE = '\033[95m'
   CYAN = '\033[96m'
@@ -15,14 +18,19 @@ class color:
   UNDERLINE = '\033[4m'
   END = '\033[0m'
 
-if '--help' in sys.argv or 'help' in sys.argv:
+parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.')
+parser.add_argument('-d', '--doc', help='show known commands and exit.', action='store_true')
+parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
+parser.add_argument('path', help='path to folder with settings.', default=os.getcwd(), nargs='?')
+args = parser.parse_args()
+
+if args.doc:
   tasks.print_doc()
   sys.exit(0)
 
-if 'run' not in sys.argv:
-  print 'Je treba spoustet s parametrem run nebo help, jinak to nic nedela!'
-  sys.exit(1)
+os.chdir(args.path)
 
+print "Processing content of %s ..." % os.getcwd()
 config = yaml.load(open('config.yml').read())
 receipt = yaml.load(open('tasks.yml').read())
 
@@ -35,6 +43,10 @@ for task in task_list:
 if len(errors) > 0:
   print 'Script contains some error:\n  %s' % '\n  '.join(errors)
   sys.exit(1)
+
+if args.syntax_check:
+  print 'Syntax of %d tasks ok.' % len(task_list)
+  sys.exit(0)
 
 cache = tasks.Cache()
 clients = tasks.Clients()
