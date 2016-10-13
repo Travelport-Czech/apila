@@ -1,0 +1,28 @@
+- name: Priprava api
+  api:
+    name: 'afd'
+    description: 'Entry to Anti-fraud detection'
+- lambda:
+    name: 'afd_attemptEvaluate'
+    runtime: 'nodejs4.3'
+    role: 'lambda_basic_execution'
+    handler: 'index.handler'
+    description: 'Book attempt evaluation'
+    timeout: 3
+    memory_size: 128
+    publish: true
+    code: 'attemptEvaluate'
+- name: Resource /attempt/evaluate
+  api-resource:
+    api: 'afd'
+    path: '/attempt/evaluate'
+    method: 'POST'
+    lambda: 'afd_attemptEvaluate'
+- api-resource:
+    api: 'afd'
+    path: '/reservation/create'
+    method: 'POST'
+    lambda: 'afd_reservationCreate'
+- api-deploy:
+    api: 'afd'
+    stage_name: 'devel'
