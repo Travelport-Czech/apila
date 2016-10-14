@@ -25,7 +25,8 @@ def clear_todo():
 parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.')
 parser.add_argument('-d', '--doc', help='show known commands and exit.', action='store_true')
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
-parser.add_argument('path', help='path to folder with settings.', default=os.getcwd(), nargs='?')
+parser.add_argument('-r', '--register', help='explicitly register events to do (can be used more times)', action='append')
+parser.add_argument('path', help='path to folder with settings.')
 args = parser.parse_args()
 
 if args.doc:
@@ -42,6 +43,9 @@ if os.path.exists('todo.yml'):
   todo = set(yaml.load(open('todo.yml').read()))
 else:
   todo = set()
+
+if args.register:
+  todo.update(args.register)
 
 task_list = [tasks.create_task(task_def, config) for task_def in receipt]
 
