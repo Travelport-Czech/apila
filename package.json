@@ -4,6 +4,7 @@
   "description": "AWS auto deploy",
   "author": "CEE Systems",
   "license": "ISC",
+  "bin": "play",
   "devDependencies": {
   },
   "dependencies": {
