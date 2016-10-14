@@ -3,6 +3,7 @@ import ApiResource
 import ApiDeploy
 import Lambda
 import UnknownTask
+import DoubleTask
 import boto3
 
 known_tasks = {
@@ -15,14 +16,32 @@ known_tasks = {
 def create_task(task_def, config):
   name = None
   task = None
+  register = None
+  when = None
+  double_task = []
+  unknown_attributes = []
   for attr, value in task_def.iteritems():
     if attr == 'name':
       name = value
+    elif attr == 'register':
+      if value:
+        register = set(value)
+    elif attr == 'when':
+      if value:
+        when = set(value)
     elif attr in known_tasks:
+      if task:
+        if not double_task:
+          double_task.append(task)
+        double_task.append(attr)
       task = attr
+    else:
+      unknown_attributes.append(attr)
+  if len(double_task):
+    return DoubleTask.DoubleTask(task_def, double_task, unknown_attributes)
   if not task:
-    return UnknownTask.UnknownTask(name, task_def, config)
-  return known_tasks[task](name, task_def[task], config)
+    return UnknownTask.UnknownTask(task_def, unknown_attributes)
+  return known_tasks[task](name, task_def[task], config, register, when, unknown_attributes)
 
 def print_doc():
   print "Known tasks:"

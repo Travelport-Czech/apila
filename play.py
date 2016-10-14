@@ -18,6 +18,10 @@ class color:
   UNDERLINE = '\033[4m'
   END = '\033[0m'
 
+def clear_todo():
+  if os.path.exists('todo.yml'):
+    os.unlink('todo.yml')
+
 parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.')
 parser.add_argument('-d', '--doc', help='show known commands and exit.', action='store_true')
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
@@ -33,6 +37,11 @@ os.chdir(args.path)
 print "Processing content of %s ..." % os.getcwd()
 config = yaml.load(open('config.yml').read())
 receipt = yaml.load(open('tasks.yml').read())
+
+if os.path.exists('todo.yml'):
+  todo = set(yaml.load(open('todo.yml').read()))
+else:
+  todo = set()
 
 task_list = [tasks.create_task(task_def, config) for task_def in receipt]
 
@@ -50,17 +59,27 @@ if args.syntax_check:
 
 cache = tasks.Cache()
 clients = tasks.Clients()
+registered = todo
 
 for task in task_list:
   print '...', ' '*15, str(task), ' ',
-  (ok, message) = task.run(clients, cache)
-  if ok:
-    if message:
-      print '\r%ssuccess (%s)%s' % (color.BLUE + color.BOLD, message, color.END)
+  if not task.when or task.when.intersection(registered):
+    (ok, message) = task.run(clients, cache)
+    if ok:
+      if message:
+        if task.register:
+          registered.update(task.register)
+        print '\r%ssuccess (%s)%s' % (color.BLUE + color.BOLD, message, color.END)
+      else:
+        print '\r%ssuccess%s' % (color.GREEN + color.BOLD, color.END)
     else:
-      print '\r%ssuccess%s' % (color.GREEN + color.BOLD, color.END)
+      print '\r%sfailed\njob failed with message "%s"!%s' % (color.RED + color.BOLD, message, color.END)
+      if registered:
+        open('todo.yml', 'w').write('# registered events after last fail\n'+yaml.dump(list(registered)))
+      else:
+        clear_todo()
+      sys.exit(1)
   else:
-    print '\r%sfailed\njob failed with message "%s"!%s' % (color.RED + color.BOLD, message, color.END)
-    sys.exit(1)
+    print '\r%sskiped%s' % (color.YELLOW + color.BOLD, color.END)
 
-
+clear_todo()

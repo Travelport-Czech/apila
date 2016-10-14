@@ -15,14 +15,21 @@
 - name: Resource /attempt/evaluate
   api-resource:
     api: 'afd'
-    path: '/attempt/evaluate'
+    path: '/attempt/evaluatexx'
     method: 'POST'
     lambda: 'afd_attemptEvaluate'
+  register: 
+    - 'deployment needed'
 - api-resource:
     api: 'afd'
     path: '/reservation/create'
     method: 'POST'
     lambda: 'afd_reservationCreate'
+  register: deployment needed
+  when:
+    - never
 - api-deploy:
     api: 'afd'
     stage_name: 'devel'
+  when:
+    - 'deployment needed'
