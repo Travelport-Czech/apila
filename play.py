@@ -66,7 +66,7 @@ clients = tasks.Clients()
 registered = todo
 
 for task in task_list:
-  print '...', ' '*15, str(task), ' ',
+  print '...', ' '*15, unicode(task).encode('utf8'), ' ',
   if not task.when or task.when.intersection(registered):
     (ok, message) = task.run(clients, cache)
     if ok:
