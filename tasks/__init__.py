@@ -4,13 +4,15 @@ import ApiDeploy
 import Lambda
 import UnknownTask
 import DoubleTask
+import DynamoDump
 import boto3
 
 known_tasks = {
   'api': ApiTask.ApiTask,
   'api-resource': ApiResource.ApiResource,
   'api-deploy': ApiDeploy.ApiDeploy,
-  'lambda': Lambda.Lambda
+  'lambda': Lambda.Lambda,
+  'dynamo-dump': DynamoDump.DynamoDump
 }
 
 def create_task(task_def, config):
@@ -45,9 +47,9 @@ def create_task(task_def, config):
 
 def print_doc():
   print "Known tasks:"
-  for name, cls in known_tasks.iteritems():
+  for name, cls in sorted(known_tasks.iteritems()):
     print '  %s: %s' % (name, cls.__doc__)
-    for param, desc in cls.known_params.iteritems():
+    for param, desc in sorted(cls.known_params.iteritems()):
       print '   %s %-15s %s' % ('*' if param in cls.required_params else ' ', param+':', desc)
     print
 

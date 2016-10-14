@@ -33,3 +33,7 @@
     stage_name: 'devel'
   when:
     - 'deployment needed'
+
+- dynamo-dump:
+    table_name: 'buresm_reservation'
+    dest: 'buresm_reservation.yml'
