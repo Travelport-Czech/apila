@@ -1,0 +1,22 @@
+{
+  "name": "antifraud-detection",
+  "version": "0.1.0",
+  "description": "Microservice Anti-fraud detection (AFD)",
+  "main": "index.js",
+  "scripts": {
+    "debug": "mocha ./tests --debug-brk --reporter spec",
+    "test": "mocha ./tests --reporter spec"
+  },
+  "author": "CEE Systems",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^3.1.2",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-install": "^0.6.0",
+    "run-sequence": "^1.2.2"
+  },
+  "dependencies": {
+    "md5": "^2.2.1"
+  }
+}

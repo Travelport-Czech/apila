@@ -1,0 +1,33 @@
+AttributeDefinitions:
+- {AttributeName: createDateTime, AttributeType: N}
+- {AttributeName: email, AttributeType: S}
+- {AttributeName: reservationArn, AttributeType: S}
+CreationDateTime: 2016-10-12 16:43:50.818000+02:00
+GlobalSecondaryIndexes:
+- IndexArn: arn:aws:dynamodb:eu-central-1:860303221267:table/buresm_reservation/index/email-createDateTime-index
+  IndexName: email-createDateTime-index
+  IndexSizeBytes: 410
+  IndexStatus: ACTIVE
+  ItemCount: 2
+  KeySchema:
+  - {AttributeName: email, KeyType: HASH}
+  - {AttributeName: createDateTime, KeyType: RANGE}
+  Projection: {ProjectionType: ALL}
+  ProvisionedThroughput: {NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+- IndexArn: arn:aws:dynamodb:eu-central-1:860303221267:table/buresm_reservation/index/reservationArn-index
+  IndexName: reservationArn-index
+  IndexSizeBytes: 410
+  IndexStatus: ACTIVE
+  ItemCount: 2
+  KeySchema:
+  - {AttributeName: reservationArn, KeyType: HASH}
+  Projection: {ProjectionType: ALL}
+  ProvisionedThroughput: {NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+ItemCount: 2
+KeySchema:
+- {AttributeName: reservationArn, KeyType: HASH}
+ProvisionedThroughput: {NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+TableArn: arn:aws:dynamodb:eu-central-1:860303221267:table/buresm_reservation
+TableName: buresm_reservation
+TableSizeBytes: 410
+TableStatus: ACTIVE

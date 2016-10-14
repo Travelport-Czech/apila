@@ -7,6 +7,7 @@ import os.path
 import hashlib
 import base64
 import botocore
+import json
 
 class Lambda(Task):
   """Create lambda function a upload code from given folder"""
@@ -34,10 +35,10 @@ class Lambda(Task):
   def get_files(self, path):
     out = []
     for root, dirs, files in os.walk(path):
-      rel_root = root[len(path):]
+      rel_root = root[len(path):].lstrip('/')
       for filename in files:
         out.append((os.path.join(root, filename), os.path.join(rel_root, filename)))
-    return sorted(out, key=lambda x: x[0])
+    return sorted(out)
 
   def create_zip(self, files):
     zip_name = tempfile.mkstemp(suffix='.zip', prefix='lambda_')[1]
@@ -48,12 +49,24 @@ class Lambda(Task):
     os.unlink(zip_name)
     return zip_data
 
+  def get_project_files(self, base_path):
+    files = self.get_files(os.path.join(base_path, 'app'))
+    package_conf = json.loads(open(os.path.join(base_path, 'package.json')).read())
+    for dependency in sorted(package_conf['dependencies'].keys()):
+      dep_path = os.path.join('node_modules', dependency)
+      this_dep_files = map(lambda x: (x[0], os.path.join(dep_path, x[1])), self.get_files(os.path.join(base_path, dep_path)))
+      files.extend(this_dep_files)
+    return files
+
   def run(self, clients, cache):
     client = clients.get('lambda')
     iam_client = clients.get('iam')
     function_name = '%s_%s_%s' % (self.config['branch'], self.config['user'], self.params['name'])
     role_arn = bototools.get_role_arn(iam_client, self.params['role'])
-    zip_data = self.create_zip(self.get_files(self.params['code']))
+    try:
+      zip_data = self.create_zip(self.get_project_files(self.params['code']))
+    except Exception as e:
+      return (False, str(e))
     if role_arn is None:
       return (False, "Required role '%s' not found" % self.params['role'])
     try:
