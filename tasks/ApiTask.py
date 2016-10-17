@@ -4,7 +4,7 @@ import bototools
 class ApiTask(Task):
   """Create api on API gateway"""
   known_params = {
-    'name': 'name of api (will be concatenate with branch and user from config.yml',
+    'name': 'name of api (will be concatenate with branch and user from config.yml)',
     'description': 'short human readable description of api'
   }
   required_params = ('name',)

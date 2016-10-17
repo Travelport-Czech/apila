@@ -18,14 +18,14 @@
     path: '/attempt/evaluatexx'
     method: 'POST'
     lambda: 'afd_attemptEvaluate'
-  register: 
+  register:
     - 'deployment needed'
 - api-resource:
     api: 'afd'
     path: '/reservation/create'
     method: 'POST'
     lambda: 'afd_reservationCreate'
-  register: deployment needed
+  register: [deployment needed]
   when:
     - never
 - api-deploy:
@@ -34,6 +34,10 @@
   when:
     - 'deployment needed'
 
+- dynamo-table:
+    name: 'reservation'
+    source: 'sample_table_reservation.yml'
+
 - dynamo-dump:
-    table_name: 'buresm_reservation'
-    dest: 'buresm_reservation.yml'
+    name: 'reservation'
+    dest: 'my_table_reservation.yml'

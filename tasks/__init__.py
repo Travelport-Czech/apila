@@ -5,6 +5,7 @@ import Lambda
 import UnknownTask
 import DoubleTask
 import DynamoDump
+import DynamoTable
 import boto3
 
 known_tasks = {
@@ -12,7 +13,8 @@ known_tasks = {
   'api-resource': ApiResource.ApiResource,
   'api-deploy': ApiDeploy.ApiDeploy,
   'lambda': Lambda.Lambda,
-  'dynamo-dump': DynamoDump.DynamoDump
+  'dynamo-dump': DynamoDump.DynamoDump,
+  'dynamo-table': DynamoTable.DynamoTable
 }
 
 def create_task(task_def, config):

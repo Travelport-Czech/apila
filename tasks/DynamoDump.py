@@ -1,26 +1,40 @@
 from Task import Task
 import os.path
 import yaml
+import time
+import name_constructor
 
 class DynamoDump(Task):
   """Dump table to yaml"""
   known_params = {
-    'table_name': 'name of table to dump',
+    'name': 'name of table to dump',
     'dest': 'full name of target file'
   }
-  required_params = ('table_name', 'dest')
-  required_configs = tuple()
+  required_params = ('name', 'dest')
+  required_configs = ('user', 'branch')
   task_name = 'dynamo-dump'
 
   def __str__(self):
     if self.name:
       return self.name
     else:
-      return "Dump table '%s' to '%s'" % (self.params['table_name'], os.path.abspath(self.params['dest']))
+      return "Dump table '%s' to '%s'" % (self.params['name'], os.path.abspath(self.params['dest']))
 
   def run(self, clients, cache):
     client = clients.get('dynamodb')
-    struct = yaml.safe_dump(client.describe_table(TableName=self.params['table_name'])['Table'])
+    table_name = name_constructor.table_name(self.params['name'], self.config['user'], self.config['branch'])
+    try:
+      table_def = client.describe_table(TableName=table_name)['Table']
+      retry = 60
+      while table_def['TableStatus'] != 'ACTIVE':
+        time.sleep(1)
+        table_def = client.describe_table(TableName=table_name)['Table']
+        retry -= 1
+        if retry < 1:
+          return (False, "Table is in state '%s' too long." % table_def['TableStatus'])
+    except  Exception as e:
+      return (False, str(e))
+    struct = yaml.safe_dump(table_def)
     result = self.CREATED
     if os.path.exists(self.params['dest']):
       result = self.CHANGED

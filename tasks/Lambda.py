@@ -8,6 +8,7 @@ import hashlib
 import base64
 import botocore
 import json
+import name_constructor
 
 class Lambda(Task):
   """Create lambda function a upload code from given folder"""
@@ -61,7 +62,7 @@ class Lambda(Task):
   def run(self, clients, cache):
     client = clients.get('lambda')
     iam_client = clients.get('iam')
-    function_name = '%s_%s_%s' % (self.config['branch'], self.config['user'], self.params['name'])
+    function_name = name_constructor.lambda_name(self.params['name'], self.config['user'], self.config['branch'])
     role_arn = bototools.get_role_arn(iam_client, self.params['role'])
     try:
       zip_data = self.create_zip(self.get_project_files(self.params['code']))

@@ -1,6 +1,7 @@
 from Task import Task
 import bototools
 import botocore
+import name_constructor
 
 class ApiResource(Task):
   """Create resource and method on Api Gateway"""
@@ -21,8 +22,8 @@ class ApiResource(Task):
       return 'Create resource %s:%s' % (self.params['api'], self.params['path'])
 
   def run(self, clients, cache):
-    api_name = '%s_%s_%s' % (self.params['api'], self.config['branch'], self.config['user'])
-    lambda_name = '%s_%s_%s' % (self.config['branch'], self.config['user'], self.params['lambda'])
+    api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
+    lambda_name = name_constructor.lambda_name(self.params['lambda'], self.config['user'], self.config['branch'])
     lambda_arn = self.get_lambda_arn(clients.get('lambda'), cache, lambda_name)
     if lambda_arn is None:
       return (False, "Lambda function '%s' not found" % lambda_name)

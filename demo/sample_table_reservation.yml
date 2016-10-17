@@ -1,0 +1,19 @@
+AttributeDefinitions:
+- {AttributeName: createDateTime, AttributeType: N}
+- {AttributeName: email, AttributeType: S}
+- {AttributeName: reservationArn, AttributeType: S}
+GlobalSecondaryIndexes:
+- IndexName: email-createDateTime-index
+  KeySchema:
+  - {AttributeName: email, KeyType: HASH}
+  - {AttributeName: createDateTime, KeyType: RANGE}
+  Projection: {ProjectionType: ALL}
+  ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+- IndexName: reservationArn-index
+  KeySchema:
+  - {AttributeName: reservationArn, KeyType: HASH}
+  Projection: {ProjectionType: ALL}
+  ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+KeySchema:
+- {AttributeName: reservationArn, KeyType: HASH}
+ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}

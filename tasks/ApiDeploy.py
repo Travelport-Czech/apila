@@ -1,5 +1,6 @@
 from Task import Task
 import bototools
+import name_constructor
 
 class ApiDeploy(Task):
   """Deploy api to given stage"""
@@ -18,7 +19,7 @@ class ApiDeploy(Task):
       return 'Deploy api %s to stage %s' % (self.params['api'], self.params['stage_name'])
 
   def run(self, clients, cache):
-    api_name = '%s_%s_%s' % (self.params['api'], self.config['branch'], self.config['user'])
+    api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
     client = clients.get('apigateway')
     api_id = cache.get('api', api_name)
     if api_id is None:

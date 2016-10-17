@@ -23,9 +23,10 @@ def clear_todo():
     os.unlink('todo.yml')
 
 parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.')
-parser.add_argument('-d', '--doc', help='show known commands and exit.', action='store_true')
+parser.add_argument('-d', '--doc', help='show known commands and exit', action='store_true')
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
-parser.add_argument('-r', '--register', help='explicitly register events to do (can be used more times)', action='append')
+parser.add_argument('-r', '--register', help='explicitly register event to do (can be used more times)', action='append', metavar='EVENT')
+parser.add_argument('-u', '--unregister', help='explicitly unregister event to do loaded from todo.yml (can be used more times)', action='append', metavar='EVENT')
 parser.add_argument('path', help='path to folder with settings.')
 args = parser.parse_args()
 
@@ -38,14 +39,6 @@ os.chdir(args.path)
 print "Processing content of %s ..." % os.getcwd()
 config = yaml.load(open('config.yml').read())
 receipt = yaml.load(open('tasks.yml').read())
-
-if os.path.exists('todo.yml'):
-  todo = set(yaml.load(open('todo.yml').read()))
-else:
-  todo = set()
-
-if args.register:
-  todo.update(args.register)
 
 task_list = [tasks.create_task(task_def, config) for task_def in receipt]
 
@@ -63,6 +56,18 @@ if args.syntax_check:
 
 cache = tasks.Cache()
 clients = tasks.Clients()
+
+if os.path.exists('todo.yml'):
+  todo = set(yaml.load(open('todo.yml').read()))
+  print "Events restored from todo.yml:", ', '.join(map(lambda x: "'%s'" % x, todo))
+else:
+  todo = set()
+
+if args.register:
+  todo.update(args.register)
+if args.unregister:
+  todo.difference_update(args.unregister)
+
 registered = todo
 
 for task in task_list:
@@ -84,6 +89,6 @@ for task in task_list:
         clear_todo()
       sys.exit(1)
   else:
-    print '\r%sskiped%s' % (color.YELLOW + color.BOLD, color.END)
+    print '\r%sskipped%s' % (color.YELLOW + color.BOLD, color.END)
 
 clear_todo()

@@ -2,32 +2,34 @@ AttributeDefinitions:
 - {AttributeName: createDateTime, AttributeType: N}
 - {AttributeName: email, AttributeType: S}
 - {AttributeName: reservationArn, AttributeType: S}
-CreationDateTime: 2016-10-12 16:43:50.818000+02:00
+CreationDateTime: 2016-10-17 11:58:55.564000+02:00
 GlobalSecondaryIndexes:
-- IndexArn: arn:aws:dynamodb:eu-central-1:860303221267:table/buresm_reservation/index/email-createDateTime-index
+- IndexArn: arn:aws:dynamodb:eu-central-1:860303221267:table/main_srb_reservation/index/email-createDateTime-index
   IndexName: email-createDateTime-index
-  IndexSizeBytes: 410
+  IndexSizeBytes: 0
   IndexStatus: ACTIVE
-  ItemCount: 2
+  ItemCount: 0
   KeySchema:
   - {AttributeName: email, KeyType: HASH}
   - {AttributeName: createDateTime, KeyType: RANGE}
   Projection: {ProjectionType: ALL}
   ProvisionedThroughput: {NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5}
-- IndexArn: arn:aws:dynamodb:eu-central-1:860303221267:table/buresm_reservation/index/reservationArn-index
+- IndexArn: arn:aws:dynamodb:eu-central-1:860303221267:table/main_srb_reservation/index/reservationArn-index
   IndexName: reservationArn-index
-  IndexSizeBytes: 410
+  IndexSizeBytes: 0
   IndexStatus: ACTIVE
-  ItemCount: 2
+  ItemCount: 0
   KeySchema:
   - {AttributeName: reservationArn, KeyType: HASH}
   Projection: {ProjectionType: ALL}
   ProvisionedThroughput: {NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5}
-ItemCount: 2
+ItemCount: 0
 KeySchema:
 - {AttributeName: reservationArn, KeyType: HASH}
-ProvisionedThroughput: {NumberOfDecreasesToday: 0, ReadCapacityUnits: 5, WriteCapacityUnits: 5}
-TableArn: arn:aws:dynamodb:eu-central-1:860303221267:table/buresm_reservation
-TableName: buresm_reservation
-TableSizeBytes: 410
+ProvisionedThroughput: {LastDecreaseDateTime: !!timestamp '2016-10-17 13:22:46.798000+02:00',
+  LastIncreaseDateTime: !!timestamp '2016-10-17 13:24:05.777000+02:00', NumberOfDecreasesToday: 1,
+  ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+TableArn: arn:aws:dynamodb:eu-central-1:860303221267:table/main_srb_reservation
+TableName: main_srb_reservation
+TableSizeBytes: 0
 TableStatus: ACTIVE
