@@ -32,6 +32,7 @@ def create_task(task_def, config):
   task = None
   register = None
   when = None
+  tags = None
   double_task = []
   unknown_attributes = []
   for attr, value in task_def.iteritems():
@@ -43,6 +44,9 @@ def create_task(task_def, config):
     elif attr == 'when':
       if value:
         when = set(value)
+    elif attr == 'tags':
+      if value:
+        tags = set(value)
     elif attr in known_tasks:
       if task:
         if not double_task:
@@ -55,7 +59,7 @@ def create_task(task_def, config):
     return DoubleTask.DoubleTask(task_def, double_task, unknown_attributes)
   if not task:
     return UnknownTask.UnknownTask(task_def, unknown_attributes)
-  return known_tasks[task](name, task_def[task], config, register, when, unknown_attributes)
+  return known_tasks[task](name, task_def[task], config, register, when, tags, unknown_attributes)
 
 def print_doc():
   print "Known tasks:"

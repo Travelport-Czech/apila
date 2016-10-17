@@ -27,6 +27,7 @@ parser.add_argument('-d', '--doc', help='show known commands and exit', action='
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
 parser.add_argument('-r', '--register', help='explicitly register event to do (can be used more times)', action='append', metavar='EVENT')
 parser.add_argument('-u', '--unregister', help='explicitly unregister event to do loaded from todo.yml (can be used more times)', action='append', metavar='EVENT')
+parser.add_argument('-t', '--tag', help='execute only tasks with specified tag (can be used more times)', action='append', metavar='TAG')
 parser.add_argument('path', help='path to folder with settings.')
 args = parser.parse_args()
 
@@ -74,10 +75,11 @@ if args.unregister:
   todo.difference_update(args.unregister)
 
 registered = todo
+tags = args.tag
 
 for task in task_list:
   print '...', ' '*15, unicode(task).encode('utf8'), ' ',
-  if not task.when or task.when.intersection(registered):
+  if (not task.when or task.when.intersection(registered)) and (not tags or (task.tags and task.tags.intersection(tags))):
     (ok, message) = task.run(clients, cache)
     if ok:
       if message:

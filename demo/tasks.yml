@@ -6,6 +6,8 @@
     dest: 'generated_config.json'
     content:
       table-name: !table_name reservation
+  tags:
+    - 'configure'
 - lambda:
     name: 'afd_attemptEvaluate'
     runtime: 'nodejs4.3'

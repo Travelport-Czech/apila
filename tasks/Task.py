@@ -1,13 +1,14 @@
 class Task:
   CHANGED = 'changed'
   CREATED = 'created'
-  def __init__(self, name, params, config, register, when, unknown_attributes):
+  def __init__(self, name, params, config, register, when, tags, unknown_attributes):
     self.name = name
     self.params = params
     self.config = config
     self.unknown_attributes = unknown_attributes
     self.register = register
     self.when = when
+    self.tags = tags
 
   def validate(self, errors):
     for param in self.unknown_attributes:
