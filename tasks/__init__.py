@@ -6,7 +6,9 @@ import UnknownTask
 import DoubleTask
 import DynamoDump
 import DynamoTable
+import JsonWrite
 import boto3
+import name_constructor
 
 known_tasks = {
   'api': ApiTask.ApiTask,
@@ -14,8 +16,16 @@ known_tasks = {
   'api-deploy': ApiDeploy.ApiDeploy,
   'lambda': Lambda.Lambda,
   'dynamo-dump': DynamoDump.DynamoDump,
-  'dynamo-table': DynamoTable.DynamoTable
+  'dynamo-table': DynamoTable.DynamoTable,
+  'json-write':  JsonWrite.JsonWrite
 }
+
+def get_yaml_tags_constructors(config):
+  return {
+       '!table_name': lambda loader, node: name_constructor.table_name(loader.construct_scalar(node), config['user'], config['branch']),
+       '!api_name': lambda loader, node: name_constructor.api_name(loader.construct_scalar(node), config['user'], config['branch']),
+       '!lambda_name': lambda loader, node: name_constructor.lambda_name(loader.construct_scalar(node), config['user'], config['branch'])
+  }
 
 def create_task(task_def, config):
   name = None

@@ -37,7 +37,12 @@ if args.doc:
 os.chdir(args.path)
 
 print "Processing content of %s ..." % os.getcwd()
+
 config = yaml.load(open('config.yml').read())
+
+for tag, constructor in tasks.get_yaml_tags_constructors(config).iteritems():
+  yaml.add_constructor(tag, constructor)
+
 receipt = yaml.load(open('tasks.yml').read())
 
 task_list = [tasks.create_task(task_def, config) for task_def in receipt]

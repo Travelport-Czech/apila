@@ -2,6 +2,10 @@
   api:
     name: 'afd'
     description: 'Entry to Anti-fraud detection'
+- json-write:
+    dest: 'generated_config.json'
+    content:
+      table-name: !table_name reservation
 - lambda:
     name: 'afd_attemptEvaluate'
     runtime: 'nodejs4.3'
