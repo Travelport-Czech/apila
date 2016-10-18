@@ -5,6 +5,15 @@ def get_api_if_exists(client, name):
       return api
   return None
 
+def get_cached_api_id_if_exists(client, cache, api_name):
+  api_id = cache.get('api', api_name)
+  if api_id is None:
+    api = get_api_if_exists(client, api_name)
+    if not api:
+      return None
+    api_id = api['id']
+    cache.put('api', api_name, api_id)
+  return api_id
 
 def get_resources_by_path(client, api_id):
   response = client.get_resources(restApiId=api_id)

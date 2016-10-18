@@ -19,6 +19,16 @@ const done = function(err, res, callback) {
 
 const actualDateTime = new Date().getTime();
 
+exports.handler = (event, context, callback) => {
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify({'message': 'Hello world'}),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+};
+
 exports.create = (event, context, callback) => {
   handler.create(event, actualDateTime, function(err, res) {
     done(err, res, callback);

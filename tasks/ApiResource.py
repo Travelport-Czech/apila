@@ -20,7 +20,7 @@ class ApiResource(Task):
     if self.name:
       return self.name
     else:
-      return 'Create resource %s:%s' % (self.params['api'], self.params['path'])
+      return 'Create resource %s:%s method %s' % (self.params['api'], self.params['path'], self.params['method'])
 
   def run(self, clients, cache):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
@@ -31,13 +31,9 @@ class ApiResource(Task):
       return (False, "Lambda function '%s' not found" % lambda_name)
     path = self.params['path']
     client = clients.get('apigateway')
-    api_id = cache.get('api', api_name)
+    api_id = bototools.get_cached_api_id_if_exists(client, cache, api_name)
     if api_id is None:
-      api = bototools.get_api_if_exists(client, api_name)
-      if api is None:
-        return (False, "Api '%s' not found" % api_name)
-      api_id = api['id']
-      cache.put('api', api_name, api_id)
+      return (False, "Api '%s' not found" % api_name)
     result = ''
     resources_by_path = bototools.get_resources_by_path(client, api_id)
     if path in resources_by_path:

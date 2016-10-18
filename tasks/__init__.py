@@ -7,6 +7,7 @@ import DoubleTask
 import DynamoDump
 import DynamoTable
 import JsonWrite
+import ApiTest
 import boto3
 import name_constructor
 
@@ -17,7 +18,8 @@ known_tasks = {
   'lambda': Lambda.Lambda,
   'dynamo-dump': DynamoDump.DynamoDump,
   'dynamo-table': DynamoTable.DynamoTable,
-  'json-write':  JsonWrite.JsonWrite
+  'json-write':  JsonWrite.JsonWrite,
+  'api-test': ApiTest.ApiTest
 }
 
 def get_yaml_tags_constructors(config):
