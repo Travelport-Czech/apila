@@ -59,8 +59,8 @@ class ApiResource(Task):
       method_info['methodIntegration'] = client.get_integration(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'])
       result = self.CHANGED
     method_integration = method_info['methodIntegration']
-    if method_integration['type'] != 'AWS':
-      return (False, "Method integration request must be of type 'AWS', not '%s'" % method_integration['type'])
+    if method_integration['type'] != 'AWS_PROXY':
+      return (False, "Method integration request must be of type 'AWS_PROXY', not '%s'" % method_integration['type'])
     if method_integration['uri'] != lambda_arn:
       client.update_integration(
         restApiId=api_id,
@@ -108,7 +108,7 @@ class ApiResource(Task):
     self.create_integration(client, api_id, path_id, lambda_arn)
 
   def create_integration(self, client, api_id, path_id, lambda_arn):
-    client.put_integration(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], type='AWS', uri=lambda_arn, integrationHttpMethod=self.params['method'])
+    client.put_integration(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], type='AWS_PROXY', uri=lambda_arn, integrationHttpMethod=self.params['method'])
     
   def add_permission(self, client, lambda_name, permissions_arn, uuid):
     result = client.add_permission(FunctionName=lambda_name, StatementId=uuid, Action="lambda:InvokeFunction", Principal="apigateway.amazonaws.com", SourceArn=permissions_arn)
