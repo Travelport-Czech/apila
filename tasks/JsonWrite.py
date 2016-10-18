@@ -24,9 +24,10 @@ class JsonWrite(Task):
     result = self.CREATED
     if os.path.exists(self.params['dest']):
       result = self.CHANGED
-      old_data = open(self.params['dest']).read()
+      with open(self.params['dest']) as f:
+        old_data = f.read()
       if old_data == data:
-        result = ''
+        return (True, '')
     try:
       open(self.params['dest'], 'w').write(data)
     except Exception as e:
