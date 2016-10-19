@@ -5,6 +5,7 @@ import tasks
 import sys
 import argparse
 import os
+import subprocess
 
 class color:
   PURPLE = '\033[95m'
@@ -22,7 +23,8 @@ def clear_todo():
   if os.path.exists('todo.yml'):
     os.unlink('todo.yml')
 
-parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.')
+columns = int(subprocess.check_output(['tput', 'cols']))
+parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.', formatter_class=lambda prog: argparse.HelpFormatter(prog, width=columns))
 parser.add_argument('-d', '--doc', help='show known commands and exit', action='store_true')
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
 parser.add_argument('-r', '--register', help='explicitly register event to do (can be used more times)', action='append', metavar='EVENT')
