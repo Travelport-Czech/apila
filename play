@@ -26,6 +26,7 @@ def clear_todo():
 columns = int(subprocess.check_output(['tput', 'cols']))
 parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.', formatter_class=lambda prog: argparse.HelpFormatter(prog, width=columns))
 parser.add_argument('-d', '--doc', help='show known commands and exit', action='store_true')
+parser.add_argument('--debug', help='on crash show backtrace', action='store_true')
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
 parser.add_argument('-r', '--register', help='explicitly register event to do (can be used more times)', action='append', metavar='EVENT')
 parser.add_argument('-u', '--unregister', help='explicitly unregister event to do loaded from todo.yml (can be used more times)', action='append', metavar='EVENT')
@@ -43,6 +44,7 @@ os.chdir(args.path)
 tasks_filename = args.entry_point if args.entry_point else 'tasks.yml'
 
 print "Processing content of %s executing %s ..." % (os.getcwd(), tasks_filename)
+
 config = yaml.load(open('config.yml').read())
 
 for tag, constructor in tasks.get_yaml_tags_constructors(config).iteritems():
@@ -81,10 +83,20 @@ if args.unregister:
 registered = todo
 tags = args.tag
 
+def task_run(clients, cache, debug):
+  if debug:
+    return task.run(clients, cache)
+  else:
+    try:
+      out = task.run(clients, cache)
+    except Exception as e:
+      out = (False, str(e))
+    return out
+
 for task in task_list:
   print '...', ' '*15, unicode(task).encode('utf8'), ' ',
   if (not task.when or task.when.intersection(registered)) and (not tags or (task.tags and task.tags.intersection(tags))):
-    (ok, message) = task.run(clients, cache)
+    (ok, message) = task_run(clients, cache, args.debug)
     if ok:
       if message:
         if task.register:
