@@ -30,6 +30,7 @@ parser.add_argument('--syntax-check', help='perform a syntax check on the playbo
 parser.add_argument('-r', '--register', help='explicitly register event to do (can be used more times)', action='append', metavar='EVENT')
 parser.add_argument('-u', '--unregister', help='explicitly unregister event to do loaded from todo.yml (can be used more times)', action='append', metavar='EVENT')
 parser.add_argument('-t', '--tag', help='execute only tasks with specified tag (can be used more times)', action='append', metavar='TAG')
+parser.add_argument('-e', '--exec', help='alternative filename to task.yml', metavar='file.yml', dest='entry_point')
 parser.add_argument('path', help='path to folder with settings.')
 args = parser.parse_args()
 
@@ -39,14 +40,15 @@ if args.doc:
 
 os.chdir(args.path)
 
-print "Processing content of %s ..." % os.getcwd()
+tasks_filename = args.entry_point if args.entry_point else 'tasks.yml'
 
+print "Processing content of %s executing %s ..." % (os.getcwd(), tasks_filename)
 config = yaml.load(open('config.yml').read())
 
 for tag, constructor in tasks.get_yaml_tags_constructors(config).iteritems():
   yaml.add_constructor(tag, constructor)
 
-receipt = yaml.load(open('tasks.yml').read())
+receipt = yaml.load(open(tasks_filename).read())
 
 task_list = [tasks.create_task(task_def, config) for task_def in receipt]
 
