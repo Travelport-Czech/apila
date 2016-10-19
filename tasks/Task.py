@@ -1,4 +1,4 @@
-class Task:
+class Task(object):
   CHANGED = 'changed'
   CREATED = 'created'
   def __init__(self, name, params, config, register, when, tags, unknown_attributes):
@@ -25,3 +25,6 @@ class Task:
     for conf in self.required_configs:
       if conf not in self.config:
         errors.append( "Task '%(name)s' need field '%(conf)s' in config.yml" % { 'name': self.task_name, 'conf': conf})
+
+  def need_context(self):
+    return False

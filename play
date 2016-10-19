@@ -6,22 +6,7 @@ import sys
 import argparse
 import os
 import subprocess
-
-class color:
-  PURPLE = '\033[95m'
-  CYAN = '\033[96m'
-  DARKCYAN = '\033[36m'
-  BLUE = '\033[94m'
-  GREEN = '\033[92m'
-  YELLOW = '\033[93m'
-  RED = '\033[91m'
-  BOLD = '\033[1m'
-  UNDERLINE = '\033[4m'
-  END = '\033[0m'
-
-def clear_todo():
-  if os.path.exists('todo.yml'):
-    os.unlink('todo.yml')
+import tasks.task_runner
 
 columns = int(subprocess.check_output(['tput', 'cols']))
 parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.', formatter_class=lambda prog: argparse.HelpFormatter(prog, width=columns))
@@ -83,35 +68,6 @@ if args.unregister:
 registered = todo
 tags = args.tag
 
-def task_run(clients, cache, debug):
-  if debug:
-    return task.run(clients, cache)
-  else:
-    try:
-      out = task.run(clients, cache)
-    except Exception as e:
-      out = (False, str(e))
-    return out
+tasks.task_runner.run_tasks(task_list, clients, cache, args.debug, registered, tags)
 
-for task in task_list:
-  print '...', ' '*15, unicode(task).encode('utf8'), ' ',
-  if (not task.when or task.when.intersection(registered)) and (not tags or (task.tags and task.tags.intersection(tags))):
-    (ok, message) = task_run(clients, cache, args.debug)
-    if ok:
-      if message:
-        if task.register:
-          registered.update(task.register)
-        print '\r%ssuccess (%s)%s' % (color.BLUE + color.BOLD, message, color.END)
-      else:
-        print '\r%ssuccess%s' % (color.GREEN + color.BOLD, color.END)
-    else:
-      print '\r%sfailed\njob failed with message "%s"!%s' % (color.RED + color.BOLD, message, color.END)
-      if registered:
-        open('todo.yml', 'w').write('# registered events after last fail\n'+yaml.dump(list(registered)))
-      else:
-        clear_todo()
-      sys.exit(1)
-  else:
-    print '\r%sskipped%s' % (color.YELLOW + color.BOLD, color.END)
-
-clear_todo()
+tasks.task_runner.clear_todo()

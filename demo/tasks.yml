@@ -2,10 +2,8 @@
   api:
     name: 'afd'
     description: 'Entry to Anti-fraud detection'
-- json-write:
-    dest: 'generated_config.json'
-    content:
-      table-name: !table_name reservation
+- include:
+    source: configure.yml
   tags:
     - 'configure'
 - lambda:

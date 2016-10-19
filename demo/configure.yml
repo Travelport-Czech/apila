@@ -1,0 +1,4 @@
+- json-write:
+    dest: 'generated_config.json'
+    content:
+      table-name: !table_name reservation
