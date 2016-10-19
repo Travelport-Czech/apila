@@ -17,6 +17,7 @@ parser.add_argument('-r', '--register', help='explicitly register event to do (c
 parser.add_argument('-u', '--unregister', help='explicitly unregister event to do loaded from todo.yml (can be used more times)', action='append', metavar='EVENT')
 parser.add_argument('-t', '--tag', help='execute only tasks with specified tag (can be used more times)', action='append', metavar='TAG')
 parser.add_argument('-e', '--exec', help='alternative filename to task.yml', metavar='file.yml', dest='entry_point')
+parser.add_argument('-c', '--conf', help='alternative filename to config.yml', metavar='file.yml')
 parser.add_argument('path', help='path to folder with settings.')
 args = parser.parse_args()
 
@@ -27,15 +28,23 @@ if args.doc:
 os.chdir(args.path)
 
 tasks_filename = args.entry_point if args.entry_point else 'tasks.yml'
+default_conf_filename = 'config.yml'
 
 print "Processing content of %s executing %s ..." % (os.getcwd(), tasks_filename)
 
-config = yaml.load(open('config.yml').read())
+conf_filename = args.conf if args.conf else default_conf_filename
+
+if conf_filename != default_conf_filename:
+  print "Using alternative config %s ..." % conf_filename
+
+with open(conf_filename) as conf_file:
+  config = yaml.load(conf_file.read())
 
 for tag, constructor in tasks.get_yaml_tags_constructors(config).iteritems():
   yaml.add_constructor(tag, constructor)
 
-receipt = yaml.load(open(tasks_filename).read())
+with open(tasks_filename) as tasks_file:
+  receipt = yaml.load(tasks_file.read())
 
 task_list = [tasks.create_task(task_def, config) for task_def in receipt]
 
