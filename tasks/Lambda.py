@@ -49,6 +49,7 @@ class Lambda(Task):
     zip_name = tempfile.mkstemp(suffix='.zip', prefix='lambda_')[1]
     with zipfile.ZipFile(zip_name, 'w') as myzip:
       for filedef in files:
+        os.utime(filedef[0], (946681200, 946681200)) # date '+%s' -d '2000-01-01'
         myzip.write(filedef[0], filedef[1])
     zip_data = open(zip_name, 'rb').read()
     os.unlink(zip_name)
