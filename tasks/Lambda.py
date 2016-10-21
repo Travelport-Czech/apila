@@ -2,6 +2,7 @@ from Task import Task
 import bototools
 import zipfile
 import tempfile
+import shutil
 import os
 import os.path
 import hashlib
@@ -9,6 +10,8 @@ import base64
 import botocore
 import json
 import name_constructor
+import logging
+import subprocess
 
 class Lambda(Task):
   """Create lambda function a upload code from given folder"""
@@ -21,7 +24,8 @@ class Lambda(Task):
     'description': 'short description about function',
     'timeout': 'max time to run code',
     'memory_size': 'amount memory reserved for run',
-    'publish': "I'm not sure, give always True ;-)"
+    'publish': "I'm not sure, give always True ;-)",
+    'babelize': "source must be convert by babel (default True)"
   }
   required_params = ('name', 'code', 'role', 'runtime', 'handler')
   required_configs = ('user', 'branch')
@@ -33,9 +37,9 @@ class Lambda(Task):
     else:
       return 'Create lambda function %s' % (self.params['description'] if 'description' in self.params else self.params['name'])
 
-  def get_files(self, path):
+  def get_files(self, path, rel_part):
     out = []
-    for root, dirs, files in os.walk(path):
+    for root, dirs, files in os.walk(os.path.join(path, rel_part)):
       rel_root = root[len(path):].lstrip('/')
       for filename in files:
         out.append((os.path.join(root, filename), os.path.join(rel_root, filename)))
@@ -50,14 +54,49 @@ class Lambda(Task):
     os.unlink(zip_name)
     return zip_data
 
-  def get_project_files(self, base_path):
-    files = self.get_files(os.path.join(base_path, 'app'))
-    package_conf = json.loads(open(os.path.join(base_path, 'package.json')).read())
-    for dependency in sorted(package_conf['dependencies'].keys()):
-      dep_path = os.path.join('node_modules', dependency)
-      this_dep_files = map(lambda x: (x[0], os.path.join(dep_path, x[1])), self.get_files(os.path.join(base_path, dep_path)))
-      files.extend(this_dep_files)
-    return files
+  def run_npm_install(self, path):
+    cwd = os.getcwd()
+    os.chdir(path)
+    try:
+      npm_out = subprocess.check_output(['npm', 'install', '--production'], stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+      logging.error(e.output)
+      raise e
+    finally:
+      os.chdir(cwd)
+
+  def babelize(self, base_path, clean_dir, babelized_dir):
+    cwd = os.getcwd()
+    if os.path.exists('../node_modules/.bin/babel'):
+      os.chdir('..')
+    if not os.path.exists('node_modules/.bin/babel'):
+      os.chdir(base_path)
+    preset_base = os.getcwd()
+    try:
+      babel_out = subprocess.check_output(' '.join(['node_modules/.bin/babel', '--presets', os.path.join(preset_base, 'node_modules', 'babel-preset-es2015-node4'), '--copy-files', '--out-dir', babelized_dir, clean_dir]), stderr=subprocess.STDOUT, shell=True)
+    except subprocess.CalledProcessError as e:
+      logging.error(e.output)
+      raise e
+    finally:
+      os.chdir(cwd)
+
+  def prepare_zipped_code(self, code_path, babelize):
+    work_dir = tempfile.mkdtemp(prefix='lambda_')
+    clean_dir = os.path.join(work_dir, 'clean')
+    os.mkdir(clean_dir)
+    shutil.copytree(os.path.join(code_path, 'app'), os.path.join(clean_dir, 'app'))
+    shutil.copy(os.path.join(code_path, 'package.json'), os.path.join(clean_dir, 'package.json'))
+    self.run_npm_install(clean_dir)
+    if babelize:
+      babelized_dir = os.path.join(work_dir, 'babelized')
+      os.mkdir(babelized_dir)
+      self.babelize(code_path, os.path.join(clean_dir, 'app'), babelized_dir)
+      files = self.get_files(babelized_dir, '') + self.get_files(clean_dir, 'node_modules')
+    else:
+      files = self.get_files(os.path.join(clean_dir, 'app'), '') + self.get_files(clean_dir, 'node_modules')
+    zip_data = self.create_zip(files)
+    shutil.rmtree(work_dir)
+    return zip_data
 
   def run(self, clients, cache):
     client = clients.get('lambda')
@@ -65,8 +104,9 @@ class Lambda(Task):
     function_name = name_constructor.lambda_name(self.params['name'], self.config['user'], self.config['branch'])
     role_arn = bototools.get_role_arn(iam_client, self.params['role'])
     try:
-      zip_data = self.create_zip(self.get_project_files(self.params['code']))
+      zip_data = self.prepare_zipped_code(self.params['code'], True if 'babelize' not in self.params else self.params['babelize'])
     except Exception as e:
+      logging.exception(str(e))
       return (False, str(e))
     if role_arn is None:
       return (False, "Required role '%s' not found" % self.params['role'])

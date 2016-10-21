@@ -1,2 +1,3 @@
 *.pyc
 /demo/todo.yml
+/node_modules

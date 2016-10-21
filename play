@@ -1,4 +1,42 @@
 #!/usr/bin/env python
+"""
+Tool execute sequence of task loaded from file at target path (default tasks.yml).
+Sample script you can see in demo/tasks.yml.
+One task can look like this:
+- name: Create something for any reason
+  <task>:
+    task_param: 'some value'
+  tags:
+    - tagname
+  register:
+    - throwed event
+  when:
+    - needed event
+or ofcourse in json syntax (is compatible wit yaml):
+[
+    {
+        "name": "Create something for any reason",
+        "<task>": {
+            "task_param": "some value"
+        },
+        "register": [
+            "throwed event"
+        ],
+        "when": [
+            "needed event"
+        ],
+        "tags": [
+            "tagname"
+        ]
+    }
+]
+attribute name is used for desribe what and why task is doing (is optional, when missing, task try create own message)
+attribute <task> is action defined what task do and his own parameters (see list of known tasks bellow)
+attribute register is a list of events to do if task end with result "created" or "changed"
+attribute when is a list of events conditioning execution of task - if is before registered one of this events, task is executed
+attribute tags is a list of ids allowing filtering tasks to execute - if you set some tag at command line, only tasks containing this tag are executed
+"""
+__version__ = '0.8.9'
 
 import yaml
 import tasks
@@ -7,10 +45,21 @@ import argparse
 import os
 import subprocess
 import tasks.task_runner
+import logging
+
+class DocAction(argparse.Action):
+  def __init__(self, option_strings, dest=argparse.SUPPRESS, help=""):
+      super(DocAction, self).__init__(option_strings=option_strings, dest=dest, default=argparse.SUPPRESS, nargs=0, help=help)
+
+  def __call__(self, parser, namespace, values, option_string=None):
+    print __doc__
+    tasks.print_doc()
+    parser.exit()
 
 columns = int(subprocess.check_output(['tput', 'cols']))
 parser = argparse.ArgumentParser(description='Setup AWS services by settings given by sequence of tasks.', formatter_class=lambda prog: argparse.HelpFormatter(prog, width=columns))
-parser.add_argument('-d', '--doc', help='show known commands and exit', action='store_true')
+parser.add_argument('-V', '--version', action='version', version='%(prog)s '+__version__)
+parser.add_argument('--doc', help='show known commands and exit', action=DocAction)
 parser.add_argument('--debug', help='on crash show backtrace', action='store_true')
 parser.add_argument('--syntax-check', help='perform a syntax check on the playbook, but do not execute it', action='store_true')
 parser.add_argument('-r', '--register', help='explicitly register event to do (can be used more times)', action='append', metavar='EVENT')
@@ -21,9 +70,7 @@ parser.add_argument('-c', '--conf', help='alternative filename to config.yml', m
 parser.add_argument('path', help='path to folder with settings.')
 args = parser.parse_args()
 
-if args.doc:
-  tasks.print_doc()
-  sys.exit(0)
+logging.basicConfig(level=(logging.ERROR if args.debug else logging.CRITICAL))
 
 os.chdir(args.path)
 
@@ -77,6 +124,6 @@ if args.unregister:
 registered = todo
 tags = args.tag
 
-tasks.task_runner.run_tasks(task_list, clients, cache, args.debug, registered, tags)
+tasks.task_runner.run_tasks(task_list, clients, cache, registered, tags)
 
 tasks.task_runner.clear_todo()

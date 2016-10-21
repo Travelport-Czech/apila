@@ -33,15 +33,14 @@ class Include(Task):
   def need_context(self):
     return True
 
-  def set_context(self, debug, registered, tags):
-    self.ctx_debug = debug
+  def set_context(self, registered, tags):
     self.ctx_registered = registered
     self.ctx_tags = tags
 
   def  run(self, clients, cache):
     self.load_tasks(self.params['source'])
     task_runner.sync_print('\r%sinclude (begin)%s\n' % (task_runner.color.CYAN + task_runner.color.BOLD, task_runner.color.END))
-    task_runner.run_tasks(self.tasks, clients, cache, self.ctx_debug, self.ctx_registered, self.ctx_tags)
+    task_runner.run_tasks(self.tasks, clients, cache, self.ctx_registered, self.ctx_tags)
     task_runner.print_task_label(self)
     task_runner.sync_print('\r%ssuccess (end)%s' % (task_runner.color.CYAN + task_runner.color.BOLD, task_runner.color.END))
     return ('True', '')
