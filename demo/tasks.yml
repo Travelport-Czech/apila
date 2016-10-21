@@ -16,6 +16,8 @@
     memory_size: 128
     publish: true
     code: 'attemptEvaluate'
+    babelize_skip:
+      - charenc
   register:
     - 'test needed'
 - name: Resource /attempt/evaluate

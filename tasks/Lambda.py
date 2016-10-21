@@ -26,7 +26,8 @@ class Lambda(Task):
     'timeout': 'max time to run code',
     'memory_size': 'amount memory reserved for run',
     'publish': "I'm not sure, give always True ;-)",
-    'babelize': "source must be convert by babel (default True)"
+    'babelize': "source must be convert by babel (default True)",
+    'babelize_skip': "list of modules to skip by babel"
   }
   required_params = ('name', 'code', 'role', 'runtime', 'handler')
   required_configs = ('user', 'branch')
@@ -93,6 +94,7 @@ class Lambda(Task):
           fout.write(new_text)
 
   def prepare_zipped_code(self, code_path, babelize):
+    excluded_mods = self.params['babelize_skip'] if 'babelize_skip' in self.params else set()
     work_dir = tempfile.mkdtemp(prefix='lambda_')
     clean_dir = os.path.join(work_dir, 'clean')
     os.mkdir(clean_dir)
@@ -101,9 +103,22 @@ class Lambda(Task):
     self.run_npm_install(clean_dir)
     if babelize:
       babelized_dir = os.path.join(work_dir, 'babelized')
+      babelized_app_dir = os.path.join(babelized_dir, 'app')
+      babelized_mod_dir = os.path.join(babelized_dir, 'node_modules')
+      clean_mod_dir = os.path.join(clean_dir, 'node_modules')
       os.mkdir(babelized_dir)
-      self.babelize(code_path, os.path.join(clean_dir, 'app'), babelized_dir)
-      files = self.get_files(babelized_dir, '') + self.get_files(clean_dir, 'node_modules')
+      os.mkdir(babelized_app_dir)
+      os.mkdir(babelized_mod_dir)
+      self.babelize(code_path, os.path.join(clean_dir, 'app'), babelized_app_dir)
+      for module_name in os.listdir(clean_mod_dir):
+        src = os.path.join(clean_mod_dir, module_name)
+        dest = os.path.join(babelized_mod_dir, module_name)
+        if module_name in excluded_mods:
+          shutil.copytree(src, dest)
+        else:
+          os.mkdir(dest)
+          self.babelize(code_path, src, dest)
+      files = self.get_files(babelized_app_dir, '') + self.get_files(babelized_dir, 'node_modules')
     else:
       files = self.get_files(os.path.join(clean_dir, 'app'), '') + self.get_files(clean_dir, 'node_modules')
     self.clean_packages(files, work_dir)

@@ -36,7 +36,7 @@ attribute register is a list of events to do if task end with result "created" o
 attribute when is a list of events conditioning execution of task - if is before registered one of this events, task is executed
 attribute tags is a list of ids allowing filtering tasks to execute - if you set some tag at command line, only tasks containing this tag are executed
 """
-__version__ = '0.8.13'
+__version__ = '0.8.14'
 
 import yaml
 import tasks
