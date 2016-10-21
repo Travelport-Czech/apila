@@ -80,6 +80,14 @@ class Lambda(Task):
     finally:
       os.chdir(cwd)
 
+  def clean_packages(self, files, path_to_remove):
+    for filename, rel in files:
+      if filename.endswith('package.json'):
+        with open(filename) as fin:
+          text = fin.read()
+        with open(filename, 'w') as fout:
+          fout.write(text.replace(path_to_remove, '/tmp'))
+
   def prepare_zipped_code(self, code_path, babelize):
     work_dir = tempfile.mkdtemp(prefix='lambda_')
     clean_dir = os.path.join(work_dir, 'clean')
@@ -94,6 +102,7 @@ class Lambda(Task):
       files = self.get_files(babelized_dir, '') + self.get_files(clean_dir, 'node_modules')
     else:
       files = self.get_files(os.path.join(clean_dir, 'app'), '') + self.get_files(clean_dir, 'node_modules')
+    self.clean_packages(files, work_dir)
     zip_data = self.create_zip(files)
     shutil.rmtree(work_dir)
     return zip_data
