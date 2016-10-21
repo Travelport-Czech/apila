@@ -12,6 +12,7 @@ import json
 import name_constructor
 import logging
 import subprocess
+import re
 
 class Lambda(Task):
   """Create lambda function a upload code from given folder"""
@@ -82,12 +83,14 @@ class Lambda(Task):
       os.chdir(cwd)
 
   def clean_packages(self, files, path_to_remove):
+    r_shasum = re.compile(r'"_shasum"[^,]+,')
     for filename, rel in files:
       if filename.endswith('package.json'):
         with open(filename) as fin:
           text = fin.read()
+        new_text = r_shasum.sub('', text.replace(path_to_remove, '/tmp'))
         with open(filename, 'w') as fout:
-          fout.write(text.replace(path_to_remove, '/tmp'))
+          fout.write(new_text)
 
   def prepare_zipped_code(self, code_path, babelize):
     work_dir = tempfile.mkdtemp(prefix='lambda_')
