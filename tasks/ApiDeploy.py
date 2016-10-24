@@ -21,13 +21,9 @@ class ApiDeploy(Task):
   def run(self, clients, cache):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
     client = clients.get('apigateway')
-    api_id = cache.get('api', api_name)
+    api_id = bototools.get_cached_api_id_if_exists(client, cache, api_name)
     if api_id is None:
-      api = bototools.get_api_if_exists(client, api_name)
-      if api is None:
-        return (False, "Api '%s' not found" % api_name)
-      api_id = api['id']
-      cache.put('api', api_name, api_id)
+      return (False, "Api '%s' not found" % api_name)
     response = client.get_deployments(restApiId=api_id)
     response = client.create_deployment(restApiId=api_id, stageName=self.params['stage_name'])
     return (True, '')

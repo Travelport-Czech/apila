@@ -20,12 +20,26 @@
       - charenc
   register:
     - 'test needed'
+- lambda:
+    name: 'simple_authorizer'
+    runtime: 'nodejs4.3'
+    role: 'lambda_basic_execution'
+    handler: 'index.handler'
+    publish: true
+    code: 'simple_authorizer'
+- api-authorizer:
+    api: 'afd'
+    name: 'Simple_authorizer'
+    lambda: 'simple_authorizer'
+  register:
+    - 'test needed'
 - name: Resource /attempt/evaluate
   api-resource:
     api: 'afd'
     path: '/attempt/evaluatexx'
     method: 'POST'
     lambda: 'afd_attemptEvaluate'
+    authorizer: 'Simple_authorizer'
   register:
     - 'deployment needed'
 - api-resource:

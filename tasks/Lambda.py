@@ -162,16 +162,21 @@ class Lambda(Task):
     return (True, result)
 
   def create(self, client, cache, function_name, role_arn, zip_data):
-    response = client.create_function(
-      FunctionName=function_name,
-      Runtime=self.params['runtime'],
-      Role=role_arn,
-      Handler=self.params['handler'],
-      Code={ 'ZipFile': zip_data },
-      Description=self.params['description'] if 'description' in self.params else None,
-      Timeout=self.params['timeout'] if 'timeout' in self.params else None,
-      MemorySize=self.params['memory_size'] if 'memory_size' in self.params else None,
-      Publish=self.params['publish'] if 'publish' in self.params else None
-    )
+    lambda_def = {
+      'FunctionName': function_name,
+      'Runtime': self.params['runtime'],
+      'Role': role_arn,
+      'Handler': self.params['handler'],
+      'Code': { 'ZipFile': zip_data }
+    }
+    if 'description' in self.params:
+      lambda_def['Description'] = self.params['description']
+    if 'timeout' in self.params:
+      lambda_def['Timeout'] = self.params['timeout']
+    if 'memory_size' in self.params:
+      lambda_def['MemorySize'] = self.params['memory_size']
+    if 'publish' in self.params:
+      lambda_def['Publish'] = self.params['publish']
+    response = client.create_function(**lambda_def)
     cache.put('lambda', function_name, response['FunctionArn'])
     return (True, self.CREATED)

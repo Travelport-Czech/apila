@@ -1,6 +1,7 @@
 import ApiTask
 import ApiResource
 import ApiDeploy
+import ApiAuthorizer
 import Lambda
 import UnknownTask
 import DoubleTask
@@ -13,6 +14,7 @@ import name_constructor
 
 known_tasks = {
   'api': ApiTask.ApiTask,
+  'api-authorizer': ApiAuthorizer.ApiAuthorizer,
   'api-resource': ApiResource.ApiResource,
   'api-deploy': ApiDeploy.ApiDeploy,
   'lambda': Lambda.Lambda,

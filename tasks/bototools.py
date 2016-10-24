@@ -1,3 +1,5 @@
+import botocore
+
 def get_api_if_exists(client, name):
   apis = client.get_rest_apis(limit=500)
   for api in apis['items']:
@@ -39,3 +41,34 @@ def get_role_arn(client, role_name):
       return role['Arn']
   return None
   
+def get_lambda_params(client_lambda, cache, lambda_name, path, method):
+  lambda_arn = cache.get('lambda', lambda_name)
+  if lambda_arn is None:
+    try:
+      function_conf = client_lambda.get_function_configuration(FunctionName=lambda_name)
+    except botocore.exceptions.ClientError:
+      return None
+    lambda_arn = function_conf['FunctionArn']
+    cache.put('lambda', lambda_name, lambda_arn)
+  parts = lambda_arn.split(':')
+  return {
+    'region': parts[3],
+    'acct_id': parts[4],
+    'version': client_lambda.meta.service_model.api_version,
+    'lambda_arn': lambda_arn,
+    'path': path,
+    'method': method
+  }
+
+def get_lambda_arn(lambda_params):
+# arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:860303221267:function:main_srbt_afd_attemptEvaluate/invocations
+# arn:aws:lambda:eu-central-1:860303221267:function:main_srbt_afd_attemptEvaluate
+  lambda_uri = 'arn:aws:apigateway:%(region)s:lambda:path/%(version)s/functions/%(lambda_arn)s/invocations' % lambda_params
+  return lambda_uri
+
+def get_authorizer_by_name(client, api_id, authorizer_name):
+  authorizers = filter(lambda item: item['name'] == authorizer_name, client.get_authorizers(restApiId=api_id)['items'])
+  if authorizers:
+    return authorizers[0]
+  else:
+    return None

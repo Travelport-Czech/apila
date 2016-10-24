@@ -1,6 +1,7 @@
 import sys
 import os
 import yaml
+import logging
 
 class color:
   PURPLE = '\033[95m'

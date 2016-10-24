@@ -10,7 +10,8 @@ class ApiResource(Task):
     'api': 'name of api',
     'path': 'path part of url on api',
     'method': 'HTTP method',
-    'lambda': 'name of function called by acces to path on api'
+    'lambda': 'name of function called by acces to path on api',
+    'authorizer': 'name of authorizer created by api-authorizer'
   }
   required_params = ('api', 'path', 'method', 'lambda')
   required_configs = ('user', 'branch')
@@ -25,10 +26,10 @@ class ApiResource(Task):
   def run(self, clients, cache):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
     lambda_name = name_constructor.lambda_name(self.params['lambda'], self.config['user'], self.config['branch'])
-    lambda_params = self.get_lambda_params(clients.get('lambda'), cache, lambda_name, self.params['path'], self.params['method'])
-    lambda_arn = self.get_lambda_arn(lambda_params)
-    if lambda_arn is None:
+    lambda_params = bototools.get_lambda_params(clients.get('lambda'), cache, lambda_name, self.params['path'], self.params['method'])
+    if lambda_params is None:
       return (False, "Lambda function '%s' not found" % lambda_name)
+    lambda_arn = bototools.get_lambda_arn(lambda_params)
     path = self.params['path']
     client = clients.get('apigateway')
     api_id = bototools.get_cached_api_id_if_exists(client, cache, api_name)
@@ -67,32 +68,20 @@ class ApiResource(Task):
         ]
       )
       result = self.CHANGED
+    patch = []
+    if 'authorizer' in self.params:
+      if method_info['authorizationType'] != 'CUSTOM':
+        patch.append({'op': 'replace', 'path': '/authorizationType', 'value': 'CUSTOM'})
+      authorizer = bototools.get_authorizer_by_name(client, api_id, self.params['authorizer']) 
+      if 'authorizerId' not in method_info or method_info['authorizerId'] != authorizer['id']:
+        patch.append({'op': 'replace', 'path': '/authorizerId', 'value': authorizer['id']})
+    else:
+      if method_info['authorizationType'] != 'NONE':
+        patch.append({'op': 'replace', 'path': '/authorizationType', 'value': 'NONE'})
+    if patch:
+      client.update_method(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], patchOperations=patch)
+      result = self.CHANGED
     return (True, result)
-
-  def get_lambda_params(self, client, cache, lambda_name, path, method):
-    lambda_arn = cache.get('lambda', lambda_name)
-    if lambda_arn is None:
-      try:
-        function_conf = client.get_function_configuration(FunctionName=lambda_name)
-      except botocore.exceptions.ClientError:
-        return None
-      lambda_arn = function_conf['FunctionArn']
-      cache.put('lambda', lambda_name, lambda_arn)
-    parts = lambda_arn.split(':')
-    return {
-      'region': parts[3],
-      'acct_id': parts[4],
-      'version': client.meta.service_model.api_version,
-      'lambda_arn': lambda_arn,
-      'path': path,
-      'method': method
-    }
-
-  def get_lambda_arn(self, lambda_params):
-# arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:860303221267:function:main_srbt_afd_attemptEvaluate/invocations
-# arn:aws:lambda:eu-central-1:860303221267:function:main_srbt_afd_attemptEvaluate
-    lambda_uri = 'arn:aws:apigateway:%(region)s:lambda:path/%(version)s/functions/%(lambda_arn)s/invocations' % lambda_params
-    return lambda_uri
 
   def get_permission_arn(self, api_id, lambda_params):
 # "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/POST/{lambda-function-name}"
@@ -100,7 +89,12 @@ class ApiResource(Task):
     return 'arn:aws:execute-api:%(region)s:%(acct_id)s:%(api_id)s/*/%(method)s%(path)s' % lambda_params
 
   def create_method(self, client, api_id, path_id, lambda_arn):
-    client.put_method(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], authorizationType='NONE')
+    if 'authorizer' in self.params:
+      authorizer = bototools.get_authorizer_by_name(client, api_id, self.params['authorizer'])
+      authorizer_id = authorizer['id']
+      client.put_method(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], authorizationType='CUSTOM', authorizerId=authorizer_id)
+    else:
+      client.put_method(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], authorizationType='NONE')
     self.create_integration(client, api_id, path_id, lambda_arn)
 
   def create_integration(self, client, api_id, path_id, lambda_arn):
