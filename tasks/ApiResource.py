@@ -10,7 +10,7 @@ class ApiResource(Task):
     'api': 'name of api',
     'path': 'path part of url on api',
     'method': 'HTTP method',
-    'lambda': 'name of function called by acces to path on api',
+    'lambda': 'name of function called by access to path on api',
     'authorizer': 'name of authorizer created by api-authorizer'
   }
   required_params = ('api', 'path', 'method', 'lambda')

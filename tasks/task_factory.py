@@ -28,8 +28,8 @@ known_tasks = {
 def get_yaml_tags_constructors(config):
   return {
     '!table_name': (
-      lambda loader, node: name_constructor.table_name(loader.construct_scalar(node), config['user'], config['branch']),
-      'create table name from given base and config.yml'
+      lambda loader, node: name_constructor.table_name(loader.construct_scalar(node), config),
+      'create table name from given base and config.yml\n    (using fields user and branch from dict dynamodb if present, else from root config)'
     ),
     '!api_name': (
       lambda loader, node: name_constructor.api_name(loader.construct_scalar(node), config['user'], config['branch']),

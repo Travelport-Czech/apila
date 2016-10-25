@@ -22,7 +22,7 @@ class DynamoDump(Task):
 
   def run(self, clients, cache):
     client = clients.get('dynamodb')
-    table_name = name_constructor.table_name(self.params['name'], self.config['user'], self.config['branch'])
+    table_name = name_constructor.table_name(self.params['name'], self.config)
     try:
       table_def = client.describe_table(TableName=table_name)['Table']
       retry = 60

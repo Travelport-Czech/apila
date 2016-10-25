@@ -28,7 +28,7 @@ class DynamoTable(Task):
       new_def = yaml.load(open(self.params['source']).read())
     except Exception as e:
       return (False, str(e))
-    table_name = name_constructor.table_name(self.params['name'], self.config['user'], self.config['branch'])
+    table_name = name_constructor.table_name(self.params['name'], self.config)
     try:
       table_def = client.describe_table(TableName=table_name)['Table']
     except botocore.exceptions.ClientError as e:

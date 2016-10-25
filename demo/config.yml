@@ -1,2 +1,4 @@
 branch: klara
 user: srb
+dynamodb:
+  branch: main
