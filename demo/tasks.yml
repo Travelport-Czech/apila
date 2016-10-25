@@ -63,6 +63,7 @@
     method: 'POST'
     stage_name: 'devel'
     request: ''
+    authorization: 'secret'
     response: {'message': 'Hello world'}
   when:
     - 'test needed'

@@ -13,6 +13,7 @@ class ApiTest(Task):
     'method': 'HTTP method',
     'stage_name': 'api deploy stage',
     'request': 'sample payload for send to api',
+    'authorization': 'token if request must be authorized',
     'response': 'expected part of response'
   }
 
@@ -48,10 +49,13 @@ class ApiTest(Task):
       'stage': self.params['stage_name'],
       'path': path
     }
+    headers = {}
+    if 'authorization' in self.params:
+      headers['Authorization'] = self.params['authorization']
     if method == 'POST':
-      r = requests.post(url_to_test, data=self.params['request'])
+      r = requests.post(url_to_test, data=self.params['request'], headers=headers)
     elif method == 'GET':
-      r = requests.get(url_to_test, params=self.params['request'])
+      r = requests.get(url_to_test, params=self.params['request'], headers=headers)
     else:
       return (False, 'Tested method must be POST or GET')
     response = r.json()
