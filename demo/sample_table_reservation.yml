@@ -8,12 +8,12 @@ GlobalSecondaryIndexes:
   - {AttributeName: email, KeyType: HASH}
   - {AttributeName: createDateTime, KeyType: RANGE}
   Projection: {ProjectionType: ALL}
-  ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+  ProvisionedThroughput: {ReadCapacityUnits: 1, WriteCapacityUnits: 1}
 - IndexName: reservationArn-index
   KeySchema:
   - {AttributeName: reservationArn, KeyType: HASH}
   Projection: {ProjectionType: ALL}
-  ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+  ProvisionedThroughput: {ReadCapacityUnits: 1, WriteCapacityUnits: 1}
 KeySchema:
 - {AttributeName: reservationArn, KeyType: HASH}
-ProvisionedThroughput: {ReadCapacityUnits: 5, WriteCapacityUnits: 5}
+ProvisionedThroughput: {ReadCapacityUnits: 1, WriteCapacityUnits: 1}
