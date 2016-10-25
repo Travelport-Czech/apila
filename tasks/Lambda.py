@@ -131,6 +131,7 @@ class Lambda(Task):
     iam_client = clients.get('iam')
     function_name = name_constructor.lambda_name(self.params['name'], self.config['user'], self.config['branch'])
     role_arn = bototools.get_role_arn(iam_client, self.params['role'])
+    description = (self.params['description'] if 'description' in self.params else '') + self.get_version_description()
     try:
       zip_data = self.prepare_zipped_code(self.params['code'], True if 'babelize' not in self.params else self.params['babelize'])
     except Exception as e:
@@ -141,15 +142,16 @@ class Lambda(Task):
     try:
       function_conf = client.get_function_configuration(FunctionName=function_name)
     except botocore.exceptions.ClientError:
-      return self.create(client, cache, function_name, role_arn, zip_data)
+      return self.create(client, cache, function_name, role_arn, zip_data, description)
     if role_arn == function_conf['Role'] and \
       self.params['runtime'] == function_conf['Runtime'] and \
       self.params['handler'] == function_conf['Handler'] and \
-      ('description' not in self.params or self.params['description'] == function_conf['Description']) and \
+      (description == function_conf['Description']) and \
       ('timeout' not in self.params or self.params['timeout'] == function_conf['Timeout']) and \
       ('memory_size' not in self.params or self.params['memory_size'] == function_conf['MemorySize']):
         result = ''
     else:
+      self.update(client, function_name, role_arn, description)
       result = self.CHANGED
     sha256_sumator = hashlib.sha256()
     sha256_sumator.update(zip_data)
@@ -161,7 +163,21 @@ class Lambda(Task):
     cache.put('lambda', function_name, function_conf['FunctionArn'])
     return (True, result)
 
-  def create(self, client, cache, function_name, role_arn, zip_data):
+  def update(self, client, function_name, role_arn, description):
+    lambda_def = {
+      'FunctionName': function_name,
+      'Runtime': self.params['runtime'],
+      'Role': role_arn,
+      'Handler': self.params['handler']
+    }
+    lambda_def['Description'] = description
+    if 'timeout' in self.params:
+      lambda_def['Timeout'] = self.params['timeout']
+    if 'memory_size' in self.params:
+      lambda_def['MemorySize'] = self.params['memory_size']
+    client.update_function_configuration(**lambda_def)
+
+  def create(self, client, cache, function_name, role_arn, zip_data, description):
     lambda_def = {
       'FunctionName': function_name,
       'Runtime': self.params['runtime'],
@@ -169,8 +185,7 @@ class Lambda(Task):
       'Handler': self.params['handler'],
       'Code': { 'ZipFile': zip_data }
     }
-    if 'description' in self.params:
-      lambda_def['Description'] = self.params['description']
+    lambda_def['Description'] = description
     if 'timeout' in self.params:
       lambda_def['Timeout'] = self.params['timeout']
     if 'memory_size' in self.params:
@@ -180,3 +195,11 @@ class Lambda(Task):
     response = client.create_function(**lambda_def)
     cache.put('lambda', function_name, response['FunctionArn'])
     return (True, self.CREATED)
+
+  def get_version_description(self):
+    manifest_path = os.path.join(self.params['code'], 'package.json')
+    if os.path.exists(manifest_path):
+      manifest = json.load(open(manifest_path))
+      if 'version' in manifest:
+        return ' (v%s)' % manifest['version']
+    return ''
