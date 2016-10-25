@@ -4,6 +4,7 @@ import yaml
 import botocore
 import name_constructor
 import time
+import sys
 
 class DynamoTable(Task):
   """Create table by yaml definition file"""
@@ -35,20 +36,47 @@ class DynamoTable(Task):
     request = self.build_update_request(table_def, new_def)
     if not request:
       return (True, '')
-    retry = 60
-    while table_def['TableStatus'] != 'ACTIVE':
-      time.sleep(1)
+    self.process_update_request(client, request, table_name)
+    return (True, self.CHANGED)
+
+  def process_update_request(self, client, request, table_name):
+    if 'GlobalSecondaryIndexUpdates' in request:
+      for index_request in request['GlobalSecondaryIndexUpdates']:
+        new_request = { 'TableName': table_name, 'AttributeDefinitions': request['AttributeDefinitions'], 'GlobalSecondaryIndexUpdates': [index_request]}
+        self.modify_table(client, new_request, table_name)
+    if 'ProvisionedThroughput' in request:
+      new_request = { 'TableName': table_name, 'ProvisionedThroughput': request['ProvisionedThroughput'] }
+      self.modify_table(client, new_request, table_name)
+
+  def modify_table(self, client, request, table_name):
+    def rotate(t):
+#      animation = ('|', '\\', '-', '/')
+      animation = (':.. ', '.:. ', '..: ', '.:. ')
+      sys.stdout.write('\b'*len(animation)+animation[t % len(animation)])
+      sys.stdout.flush()
+
+    retry = 600
+    sys.stdout.write('\r')
+    while True:
       table_def = client.describe_table(TableName=table_name)['Table']
+      busy_reason = self.table_busy_reason(table_def)
+      if busy_reason == '':
+        break
       retry -= 1
       if retry < 1:
-        return (False, "Table is in state '%s' too long." % table_def['TableStatus'])
-    request['TableName'] = table_name
-    print str(request)
-    try:
-      client.update_table(**request)
-    except Exception as e:
-      return (False, str(e))
-    return (True, self.CHANGED)
+        raise Exception("%s too long." % busy_reason)
+      rotate(retry)
+      time.sleep(1)
+    client.update_table(**request)
+
+  def table_busy_reason(self, table_def):
+    if table_def['TableStatus'] != 'ACTIVE':
+      return 'Table is in state %s' % table_def['TableStatus']
+    if 'GlobalSecondaryIndexes' in table_def:
+      for index in table_def['GlobalSecondaryIndexes']:
+        if index['IndexStatus'] != 'ACTIVE':
+          return 'Index %s is in state %s' % (index['IndexName'], index['IndexStatus'])
+    return ''
 
   def build_update_request(self, table_def, new_def):
     request = {}
