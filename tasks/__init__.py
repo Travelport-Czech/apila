@@ -8,6 +8,14 @@ def print_doc():
     for param, desc in sorted(cls.known_params.iteritems()):
       print '   %s %-15s %s' % ('*' if param in cls.required_params else ' ', param+':', desc)
     print
+  print """
+Value of any attribute can be simple function call (all attribute, not part). I.e.:'
+- name: !function function_parameter
+
+known functions are:"""
+  for tag_name, (tag_fce, tag_desc) in sorted(get_yaml_tags_constructors({}).iteritems()):
+    print '  %s: %s' % (tag_name, tag_desc)
+  print
 
 class Clients:
   def __init__(self):

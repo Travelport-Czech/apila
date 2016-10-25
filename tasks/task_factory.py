@@ -27,9 +27,26 @@ known_tasks = {
 
 def get_yaml_tags_constructors(config):
   return {
-       '!table_name': lambda loader, node: name_constructor.table_name(loader.construct_scalar(node), config['user'], config['branch']),
-       '!api_name': lambda loader, node: name_constructor.api_name(loader.construct_scalar(node), config['user'], config['branch']),
-       '!lambda_name': lambda loader, node: name_constructor.lambda_name(loader.construct_scalar(node), config['user'], config['branch'])
+    '!table_name': (
+      lambda loader, node: name_constructor.table_name(loader.construct_scalar(node), config['user'], config['branch']),
+      'create table name from given base and config.yml'
+    ),
+    '!api_name': (
+      lambda loader, node: name_constructor.api_name(loader.construct_scalar(node), config['user'], config['branch']),
+      'create api name from given base and config.yml'
+    ),
+    '!lambda_name': (
+      lambda loader, node: name_constructor.lambda_name(loader.construct_scalar(node), config['user'], config['branch']),
+      'create lambda name from given base and config.yml'
+    ),
+    '!config': (
+      lambda loader, node: config[loader.construct_scalar(node)],
+      'return config value by given key'
+    ),
+    '!template': (
+      lambda loader, node: loader.construct_scalar(node).format(**config),
+      'use given string as template for render config.yml\n    i.e.: "-name !template Super task for user {user} on branch {branch}"\n    Do not use this to compose lambda name, api name etc - use defined functions for this!!!'
+    )
   }
 
 def create_task(task_def, config):

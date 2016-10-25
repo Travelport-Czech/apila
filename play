@@ -88,7 +88,7 @@ with open(conf_filename) as conf_file:
   config = yaml.load(conf_file.read())
 
 for tag, constructor in tasks.get_yaml_tags_constructors(config).iteritems():
-  yaml.add_constructor(tag, constructor)
+  yaml.add_constructor(tag, constructor[0])
 
 with open(tasks_filename) as tasks_file:
   receipt = yaml.load(tasks_file.read())
