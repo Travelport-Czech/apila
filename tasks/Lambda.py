@@ -1,5 +1,3 @@
-from Task import Task
-import bototools
 import zipfile
 import tempfile
 import shutil
@@ -7,15 +5,18 @@ import os
 import os.path
 import hashlib
 import base64
-import botocore
 import json
-import name_constructor
 import logging
 import subprocess
 import re
+import botocore
+
+import tasks.name_constructor as name_constructor
+import tasks.bototools as bototools
+from tasks.Task import Task
 
 class Lambda(Task):
-  """Create lambda function a upload code from given folder"""
+  """Create lambda function and upload code from given folder"""
   known_params = {
     'name': 'function name',
     'code': "path to folder with function's source code",
@@ -183,7 +184,7 @@ class Lambda(Task):
       'Runtime': self.params['runtime'],
       'Role': role_arn,
       'Handler': self.params['handler'],
-      'Code': { 'ZipFile': zip_data }
+      'Code': {'ZipFile': zip_data}
     }
     lambda_def['Description'] = description
     if 'timeout' in self.params:
