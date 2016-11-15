@@ -7,10 +7,11 @@ import time
 import sys
 
 class DynamoTable(Task):
-  """Create table by yaml definition file"""
+  """Create or remove table by yaml definition file"""
   known_params = {
     'name': 'name of table to create',
-    'source': 'full name of file with definition (see demo/sample_reservation.yml)'
+    'source': 'full name of file with definition (see demo/sample_reservation.yml)',
+    'state': 'table can be in two states: present (it is default state) or absent'
   }
   required_params = ( 'name', 'source' )
   required_configs = ('user', 'branch')
@@ -24,11 +25,26 @@ class DynamoTable(Task):
 
   def run(self, clients, cache):
     client = clients.get('dynamodb')
+    table_name = name_constructor.table_name(self.params['name'], self.config)
+    if 'state' in self.params and self.params['state'] == 'absent':
+      return self.make_table_absent(client, table_name)
+    else:
+      return self.make_table_present(client, table_name)
+
+  def make_table_absent(self, client, table_name):
+    try:
+      table_def = client.describe_table(TableName=table_name)['Table']
+    except botocore.exceptions.ClientError as e:
+      return (True, '')
+    self.wait_for_table(client, table_name)
+    client.delete_table(TableName=table_name)
+    return (True, self.CHANGED)
+
+  def make_table_present(self, client, table_name):
     try:
       new_def = yaml.load(open(self.params['source']).read())
     except Exception as e:
       return (False, str(e))
-    table_name = name_constructor.table_name(self.params['name'], self.config)
     try:
       table_def = client.describe_table(TableName=table_name)['Table']
     except botocore.exceptions.ClientError as e:
@@ -48,7 +64,7 @@ class DynamoTable(Task):
       new_request = { 'TableName': table_name, 'ProvisionedThroughput': request['ProvisionedThroughput'] }
       self.modify_table(client, new_request, table_name)
 
-  def modify_table(self, client, request, table_name):
+  def wait_for_table(self, client, table_name):
     def rotate(t):
 #      animation = ('|', '\\', '-', '/')
       animation = (':.. ', '.:. ', '..: ', '.:. ')
@@ -67,6 +83,9 @@ class DynamoTable(Task):
         raise Exception("%s too long." % busy_reason)
       rotate(retry)
       time.sleep(1)
+
+  def modify_table(self, client, request, table_name):
+    self.wait_for_table(client, table_name)
     client.update_table(**request)
 
   def table_busy_reason(self, table_def):
