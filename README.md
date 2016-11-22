@@ -4,44 +4,46 @@ Apila
 This tool executes sequence of AWS tasks. The sequence is loaded from a file in a given path. Default filename is tasks.yml.
 You can find sample script in demo/tasks.yml.
 One task can look like this:
-- name: Create something for any reason
-  <task>:
-    task_param: 'some value'
-  tags:
-    - tagname
-  register:
-    - thrown event
-  when:
-    - needed event
+    - name: Create something for any reason
+      <task>:
+        task_param: 'some value'
+      tags:
+        - tagname
+      register:
+        - thrown event
+      when:
+        - needed event
 or you can use json syntax (it is compatible with yaml):
-[
-    {
-        "name": "Create something for any reason",
-        "<task>": {
-            "task_param": "some value"
-        },
-        "register": [
-            "thrown event"
-        ],
-        "when": [
-            "needed event"
-        ],
-        "tags": [
-            "tagname"
-        ]
-    }
-]
-attribute name can be used for description of goals and reasons for given task. It's optional. When missing, task will create the message.
-attribute <task> defines action what to do. Tasks can accept his own parameters (see list of known tasks bellow).
-attribute register is a list of events to emit if the task ends with result "created" or "changed"
-attribute when is a list of events for which the task is listening.
-attribute tags is a list of custom tags, you can set some tag at command line, only tasks containing this tag will be executed
+    [
+        {
+            "name": "Create something for any reason",
+            "<task>": {
+                "task_param": "some value"
+            },
+            "register": [
+                "thrown event"
+            ],
+            "when": [
+                "needed event"
+            ],
+            "tags": [
+                "tagname"
+            ]
+        }
+    ]
+- attribute name can be used for description of goals and reasons for given task. It's optional. When missing, task will create the message.
+- attribute <task> defines action what to do. Tasks can accept his own parameters (see list of known tasks bellow).
+- attribute register is a list of events to emit if the task ends with result "created" or "changed"
+- attribute when is a list of events for which the task is listening.
+- attribute tags is a list of custom tags, you can set some tag at command line, only tasks containing this tag will be executed
 
 Known tasks
 -----------
+
   api: Create an api on API gateway
      description:    short human readable description of the api
    * name:           name of the api (will be concatenated with fields branch and user from config.yml)
+
 
   api-authorizer: Create an authorizer for given api
    * api:            name of the api to deploy
@@ -49,9 +51,11 @@ Known tasks
    * lambda:         name of the "gatekeeper" lambda function
    * name:           name of the authorizer
 
+
   api-deploy: Deploy an api to given stage
    * api:            name of the api to deploy
    * stage_name:     name of the stage
+
 
   api-resource: Create a resource and a method on Api Gateway
    * api:            name of the api
@@ -59,6 +63,7 @@ Known tasks
    * lambda:         name of a function called to handle this endpoint
    * method:         supported HTTP method
    * path:           name of the resource (path part of an url)
+
 
   api-test: Test an api by simple request
    * api:            name of the api
@@ -69,21 +74,26 @@ Known tasks
    * response:       expected part of the response
    * stage_name:     name of the stage
 
+
   dynamo-dump: Dump a table to yaml
    * dest:           full name of a target file
    * name:           name of the table to be dumped
+
 
   dynamo-table: Create or remove a table by yaml definition file
    * name:           name of the table to be created or removed
    * source:         full name of the file with the definition (see demo/sample_reservation.yml)
      state:          table can be in two states: present (it is the default state) or absent
 
+
   include: Include tasks from a given tasklist file
    * source:         filename of the tasklist
+
 
   json-write: Write data into a JSON encoded file
    * content:        structure to be written into the file
    * dest:           full name of the target file
+
 
   lambda: Create a lambda function and upload the code from given folder
      babelize:       flag if the source must be converted by babel (default True)
