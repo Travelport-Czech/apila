@@ -1,0 +1,5 @@
+- dynamo-table:
+    name: 'reservation'
+    source: 'sample_table_reservation.yml'
+    state: absent
+
