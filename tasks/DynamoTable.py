@@ -7,10 +7,10 @@ import time
 import sys
 
 class DynamoTable(Task):
-  """Create table by yaml definition file"""
+  """Create a table by yaml definition file"""
   known_params = {
-    'name': 'name of table to create',
-    'source': 'full name of file with definition (see demo/sample_reservation.yml)'
+    'name': 'name of the table to be created',
+    'source': 'full name of the file with the definition (see demo/sample_reservation.yml)'
   }
   required_params = ( 'name', 'source' )
   required_configs = ('user', 'branch')
@@ -20,7 +20,7 @@ class DynamoTable(Task):
     if self.name:
       return self.name
     else:
-      return "Create table '%s' from '%s'" % (self.params['name'], os.path.abspath(self.params['source']))
+      return "Create a table '%s' from '%s'" % (self.params['name'], os.path.abspath(self.params['source']))
 
   def run(self, clients, cache):
     client = clients.get('dynamodb')

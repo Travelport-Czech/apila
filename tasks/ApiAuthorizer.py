@@ -4,12 +4,12 @@ import name_constructor
 import uuid
 
 class ApiAuthorizer(Task):
-  """Create authorizer to given api"""
+  """Create an authorizer for given api"""
   known_params = {
-    'api': 'name of api to deploy',
-    'name': 'name of authorizer',
-    'lambda': 'name of "getekeeper" lambda',
-    'cache_ttl': 'life of result cache in seconds (default no cache)'
+    'api': 'name of the api to deploy',
+    'name': 'name of the authorizer',
+    'lambda': 'name of the "gatekeeper" lambda function',
+    'cache_ttl': 'cache results of authorization for given number of seconds (default is no cache)'
   }
   required_params = ('api', 'name', 'lambda')
   required_configs = ('user', 'branch')
@@ -19,7 +19,7 @@ class ApiAuthorizer(Task):
       if self.name:
         return self.name
       else:
-        return 'Create authorizer %s for api %s via %s' % (self.params['name'], self.params['api'], self.params['lambda'])
+        return 'Create an authorizer %s for api %s via %s' % (self.params['name'], self.params['api'], self.params['lambda'])
 
   def run(self, clients, cache):
       api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])

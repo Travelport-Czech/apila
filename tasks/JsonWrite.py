@@ -3,10 +3,10 @@ import os.path
 import json
 
 class JsonWrite(Task):
-  """Write data into JSON encoded file"""
+  """Write data into a JSON encoded file"""
   known_params = {
-    'content': 'structure to write into file',
-    'dest': 'full name of target file'
+    'content': 'structure to be written into the file',
+    'dest': 'full name of the target file'
   }
   required_params = ('content', 'dest')
   required_configs = ('user', 'branch')

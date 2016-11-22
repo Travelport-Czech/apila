@@ -29,23 +29,23 @@ def get_yaml_tags_constructors(config):
   return {
     '!table_name': (
       lambda loader, node: name_constructor.table_name(loader.construct_scalar(node), config),
-      'create table name from given base and config.yml\n    (using fields user and branch from dict dynamodb if present, else from root config)'
+      'create a table name from given base name and config.yml\n    (uses fields user and branch from dict dynamodb if present, else from root config)'
     ),
     '!api_name': (
       lambda loader, node: name_constructor.api_name(loader.construct_scalar(node), config['user'], config['branch']),
-      'create api name from given base and config.yml'
+      'create an api name from given base name and config.yml'
     ),
     '!lambda_name': (
       lambda loader, node: name_constructor.lambda_name(loader.construct_scalar(node), config['user'], config['branch']),
-      'create lambda name from given base and config.yml'
+      'create a lambda name from given base name and config.yml'
     ),
     '!config': (
       lambda loader, node: config[loader.construct_scalar(node)],
-      'return config value by given key'
+      'return config value for given key'
     ),
     '!template': (
       lambda loader, node: loader.construct_scalar(node).format(**config),
-      'use given string as template for render config.yml\n    i.e.: "-name !template Super task for user {user} on branch {branch}"\n    Do not use this to compose lambda name, api name etc - use defined functions for this!!!'
+      'use given string as a template for rendering config.yml\n    i.e.: "-name !template Super task for an user {user} on a branch {branch}"\n    Don\'t use this to compose a lambda name, an api name etc - use defined functions for this!!!'
     )
   }
 

@@ -4,9 +4,9 @@ import task_factory
 import task_runner
 
 class Include(Task):
-  """Include tasks from given file"""
+  """Include tasks from a given tasklist file"""
   known_params = {
-    'source': 'filename of tasklist'
+    'source': 'filename of the tasklist'
   }
   required_params = ('source',)
   required_configs = tuple()

@@ -16,19 +16,19 @@ import tasks.bototools as bototools
 from tasks.Task import Task
 
 class Lambda(Task):
-  """Create lambda function and upload code from given folder"""
+  """Create a lambda function and upload the code from given folder"""
   known_params = {
     'name': 'function name',
-    'code': "path to folder with function's source code",
-    'role': 'name of role for run of function',
-    'runtime': "name and version of interpret for run i.e.: 'nodejs4.3'",
-    'handler': 'entrypoint to function code',
-    'description': 'short description about function',
-    'timeout': 'max time to run code',
-    'memory_size': 'amount memory reserved for run',
+    'code': "path to the folder with function's source code",
+    'role': 'name of a role for the execution of the function',
+    'runtime': "name and a version of interpret for the execution i.e.: 'nodejs4.3'",
+    'handler': 'entrypoint to the function code',
+    'description': 'short description of the function',
+    'timeout': 'maximal time for the execution of the function',
+    'memory_size': 'amount of memory reserved for the execution of the function',
     'publish': "I'm not sure, give always True ;-)",
-    'babelize': "source must be convert by babel (default True)",
-    'babelize_skip': "list of modules to skip by babel"
+    'babelize': "flag if the source must be converted by babel (default True)",
+    'babelize_skip': "list of modules to be skipped by babel"
   }
   required_params = ('name', 'code', 'role', 'runtime', 'handler')
   required_configs = ('user', 'branch')
@@ -38,7 +38,7 @@ class Lambda(Task):
     if self.name:
       return self.name
     else:
-      return 'Create lambda function %s' % (self.params['description'] if 'description' in self.params else self.params['name'])
+      return 'Create a lambda function %s' % (self.params['description'] if 'description' in self.params else self.params['name'])
 
   def get_files(self, path, rel_part):
     out = []

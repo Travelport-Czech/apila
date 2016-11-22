@@ -5,10 +5,10 @@ import time
 import name_constructor
 
 class DynamoDump(Task):
-  """Dump table to yaml"""
+  """Dump a table to yaml"""
   known_params = {
-    'name': 'name of table to dump',
-    'dest': 'full name of target file'
+    'name': 'name of the table to be dumped',
+    'dest': 'full name of a target file'
   }
   required_params = ('name', 'dest')
   required_configs = ('user', 'branch')
@@ -18,7 +18,7 @@ class DynamoDump(Task):
     if self.name:
       return self.name
     else:
-      return "Dump table '%s' to '%s'" % (self.params['name'], os.path.abspath(self.params['dest']))
+      return "Dump a table '%s' to '%s'" % (self.params['name'], os.path.abspath(self.params['dest']))
 
   def run(self, clients, cache):
     client = clients.get('dynamodb')

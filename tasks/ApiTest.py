@@ -5,16 +5,16 @@ import requests
 import json
 
 class ApiTest(Task):
-  """Test api by simple request"""
+  """Test an api by simple request"""
 
   known_params = {
-    'api': 'name of api',
-    'path': 'path part of url on api',
-    'method': 'HTTP method',
-    'stage_name': 'api deploy stage',
-    'request': 'sample payload for send to api',
-    'authorization': 'token if request must be authorized',
-    'response': 'expected part of response'
+    'api': 'name of the api',
+    'path': 'the path part of url on the api',
+    'method': 'used HTTP method',
+    'stage_name': 'name of the stage',
+    'request': 'sample of payload to be send',
+    'authorization': 'an authorization token (if request must be authorized)',
+    'response': 'expected part of the response'
   }
 
   required_params = ('api', 'path', 'method', 'stage_name', 'request', 'response')
@@ -25,7 +25,7 @@ class ApiTest(Task):
     if self.name:
       return self.name
     else:
-      return 'Test resource %s:%s method %s' % (self.params['api'], self.params['path'], self.params['method'])
+      return 'Test a resource %s:%s method %s' % (self.params['api'], self.params['path'], self.params['method'])
 
   def run(self, clients, cache):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])

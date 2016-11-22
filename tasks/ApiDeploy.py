@@ -3,10 +3,10 @@ import bototools
 import name_constructor
 
 class ApiDeploy(Task):
-  """Deploy api to given stage"""
+  """Deploy an api to given stage"""
   known_params = {
-    'api': 'name of api to deploy',
-    'stage_name': 'target stage'
+    'api': 'name of the api to deploy',
+    'stage_name': 'name of the stage'
   }
   required_params = ('api', 'stage_name')
   required_configs = ('user', 'branch')
@@ -16,7 +16,7 @@ class ApiDeploy(Task):
     if self.name:
       return self.name
     else:
-      return 'Deploy api %s to stage %s' % (self.params['api'], self.params['stage_name'])
+      return 'Deploy an api %s to stage %s' % (self.params['api'], self.params['stage_name'])
 
   def run(self, clients, cache):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])

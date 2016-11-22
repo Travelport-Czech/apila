@@ -2,10 +2,10 @@ from Task import Task
 import bototools
 
 class ApiTask(Task):
-  """Create api on API gateway"""
+  """Create an api on API gateway"""
   known_params = {
-    'name': 'name of api (will be concatenate with branch and user from config.yml)',
-    'description': 'short human readable description of api'
+    'name': 'name of the api (will be concatenated with fields branch and user from config.yml)',
+    'description': 'short human readable description of the api'
   }
   required_params = ('name',)
   required_configs = ('user', 'branch')
@@ -15,7 +15,7 @@ class ApiTask(Task):
     if self.name:
       return self.name
     else:
-      return 'Create api %s' % (self.params['description'] if 'description' in self.params else self.params['name'])
+      return 'Create an api %s' % (self.params['description'] if 'description' in self.params else self.params['name'])
 
   def run(self, clients, cache):
     client = clients.get('apigateway')

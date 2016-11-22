@@ -5,13 +5,13 @@ import name_constructor
 import uuid
 
 class ApiResource(Task):
-  """Create resource and method on Api Gateway"""
+  """Create a resource and a method on Api Gateway"""
   known_params = {
-    'api': 'name of api',
-    'path': 'path part of url on api',
-    'method': 'HTTP method',
-    'lambda': 'name of function called by access to path on api',
-    'authorizer': 'name of authorizer created by api-authorizer'
+    'api': 'name of the api',
+    'path': 'name of the resource (path part of an url)',
+    'method': 'supported HTTP method',
+    'lambda': 'name of a function called to handle this endpoint',
+    'authorizer': 'name of an authorizer (created by api-authorizer)'
   }
   required_params = ('api', 'path', 'method', 'lambda')
   required_configs = ('user', 'branch')
@@ -21,7 +21,7 @@ class ApiResource(Task):
     if self.name:
       return self.name
     else:
-      return 'Create resource %s:%s method %s' % (self.params['api'], self.params['path'], self.params['method'])
+      return 'Create a resource %s:%s method %s' % (self.params['api'], self.params['path'], self.params['method'])
 
   def run(self, clients, cache):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
