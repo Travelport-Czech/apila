@@ -17,6 +17,7 @@ One task can look like this:
       when:
         - needed event
 or you can use json syntax (it is compatible with yaml):
+
     [
         {
             "name": "Create something for any reason",
@@ -43,24 +44,24 @@ or you can use json syntax (it is compatible with yaml):
 Known tasks
 -----------
 
-  api: Create an api on API gateway
+api: Create an api on API gateway
      description:    short human readable description of the api
    * name:           name of the api (will be concatenated with fields branch and user from config.yml)
 
 
-  api-authorizer: Create an authorizer for given api
+api-authorizer: Create an authorizer for given api
    * api:            name of the api to deploy
      cache_ttl:      cache results of authorization for given number of seconds (default is no cache)
    * lambda:         name of the "gatekeeper" lambda function
    * name:           name of the authorizer
 
 
-  api-deploy: Deploy an api to given stage
+api-deploy: Deploy an api to given stage
    * api:            name of the api to deploy
    * stage_name:     name of the stage
 
 
-  api-resource: Create a resource and a method on Api Gateway
+api-resource: Create a resource and a method on Api Gateway
    * api:            name of the api
      authorizer:     name of an authorizer (created by api-authorizer)
    * lambda:         name of a function called to handle this endpoint
@@ -68,7 +69,7 @@ Known tasks
    * path:           name of the resource (path part of an url)
 
 
-  api-test: Test an api by simple request
+api-test: Test an api by simple request
    * api:            name of the api
      authorization:  an authorization token (if request must be authorized)
    * method:         used HTTP method
@@ -78,27 +79,27 @@ Known tasks
    * stage_name:     name of the stage
 
 
-  dynamo-dump: Dump a table to yaml
+dynamo-dump: Dump a table to yaml
    * dest:           full name of a target file
    * name:           name of the table to be dumped
 
 
-  dynamo-table: Create or remove a table by yaml definition file
+dynamo-table: Create or remove a table by yaml definition file
    * name:           name of the table to be created or removed
    * source:         full name of the file with the definition (see demo/sample_reservation.yml)
      state:          table can be in two states: present (it is the default state) or absent
 
 
-  include: Include tasks from a given tasklist file
+include: Include tasks from a given tasklist file
    * source:         filename of the tasklist
 
 
-  json-write: Write data into a JSON encoded file
+json-write: Write data into a JSON encoded file
    * content:        structure to be written into the file
    * dest:           full name of the target file
 
 
-  lambda: Create a lambda function and upload the code from given folder
+lambda: Create a lambda function and upload the code from given folder
      babelize:       flag if the source must be converted by babel (default True)
      babelize_skip:  list of modules to be skipped by babel
    * code:           path to the folder with function's source code
