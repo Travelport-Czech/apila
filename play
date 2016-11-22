@@ -36,7 +36,7 @@ attribute register is a list of events to emit if the task ends with result "cre
 attribute when is a list of events for which the task is listening.
 attribute tags is a list of custom tags, you can set some tag at command line, only tasks containing this tag will be executed
 """
-__version__ = '0.8.18'
+__version__ = '0.8.19'
 
 import yaml
 import tasks
@@ -52,8 +52,13 @@ class DocAction(argparse.Action):
       super(DocAction, self).__init__(option_strings=option_strings, dest=dest, default=argparse.SUPPRESS, nargs=0, help=help)
 
   def __call__(self, parser, namespace, values, option_string=None):
+    print "Apila"
+    print "====="
     print __doc__
     tasks.print_doc()
+    print "Interpret usage"
+    print "---------------"
+    parser.print_help()
     parser.exit()
 
 columns = int(subprocess.check_output(['tput', 'cols']))

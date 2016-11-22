@@ -2,13 +2,16 @@ import boto3
 from task_factory import known_tasks, get_yaml_tags_constructors, create_task
 
 def print_doc():
-  print "Known tasks:"
+  print "Known tasks"
+  print "-----------"
   for name, cls in sorted(known_tasks.iteritems()):
     print '  %s: %s' % (name, cls.__doc__)
     for param, desc in sorted(cls.known_params.iteritems()):
       print '   %s %-15s %s' % ('*' if param in cls.required_params else ' ', param+':', desc)
     print
   print """
+Functions in tasks
+------------------
 Value of any attribute can be simple function call (all attribute, not part). I.e.:'
 - name: !function function_parameter
 
