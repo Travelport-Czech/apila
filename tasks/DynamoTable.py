@@ -10,7 +10,7 @@ class DynamoTable(Task):
   """Create or remove a table by yaml definition file"""
   known_params = {
     'name': 'name of the table to be created or removed',
-    'source': 'full name of the file with the definition (see demo/sample_reservation.yml)'
+    'source': 'full name of the file with the definition (see demo/sample_reservation.yml)',
     'state': 'table can be in two states: present (it is the default state) or absent'
   }
   required_params = ( 'name', 'source' )
