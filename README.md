@@ -2,8 +2,11 @@ Apila
 =====
 
 This tool executes sequence of AWS tasks. The sequence is loaded from a file in a given path. Default filename is tasks.yml.
+
 You can find sample script in demo/tasks.yml.
+
 One task can look like this:
+
     - name: Create something for any reason
       <task>:
         task_param: 'some value'
