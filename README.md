@@ -45,11 +45,15 @@ Known tasks
 -----------
 
 api: Create an api on API gateway
+mandatory|parameter|description
+---|---|---
  [ ] | description:    | short human readable description of the api
  [*] | name:           | name of the api (will be concatenated with fields branch and user from config.yml)
 
 
 api-authorizer: Create an authorizer for given api
+mandatory|parameter|description
+---|---|---
  [*] | api:            | name of the api to deploy
  [ ] | cache_ttl:      | cache results of authorization for given number of seconds (default is no cache)
  [*] | lambda:         | name of the "gatekeeper" lambda function
@@ -57,11 +61,15 @@ api-authorizer: Create an authorizer for given api
 
 
 api-deploy: Deploy an api to given stage
+mandatory|parameter|description
+---|---|---
  [*] | api:            | name of the api to deploy
  [*] | stage_name:     | name of the stage
 
 
 api-resource: Create a resource and a method on Api Gateway
+mandatory|parameter|description
+---|---|---
  [*] | api:            | name of the api
  [ ] | authorizer:     | name of an authorizer (created by api-authorizer)
  [*] | lambda:         | name of a function called to handle this endpoint
@@ -70,6 +78,8 @@ api-resource: Create a resource and a method on Api Gateway
 
 
 api-test: Test an api by simple request
+mandatory|parameter|description
+---|---|---
  [*] | api:            | name of the api
  [ ] | authorization:  | an authorization token (if request must be authorized)
  [*] | method:         | used HTTP method
@@ -80,26 +90,36 @@ api-test: Test an api by simple request
 
 
 dynamo-dump: Dump a table to yaml
+mandatory|parameter|description
+---|---|---
  [*] | dest:           | full name of a target file
  [*] | name:           | name of the table to be dumped
 
 
 dynamo-table: Create or remove a table by yaml definition file
+mandatory|parameter|description
+---|---|---
  [*] | name:           | name of the table to be created or removed
  [*] | source:         | full name of the file with the definition (see demo/sample_reservation.yml)
  [ ] | state:          | table can be in two states: present (it is the default state) or absent
 
 
 include: Include tasks from a given tasklist file
+mandatory|parameter|description
+---|---|---
  [*] | source:         | filename of the tasklist
 
 
 json-write: Write data into a JSON encoded file
+mandatory|parameter|description
+---|---|---
  [*] | content:        | structure to be written into the file
  [*] | dest:           | full name of the target file
 
 
 lambda: Create a lambda function and upload the code from given folder
+mandatory|parameter|description
+---|---|---
  [ ] | babelize:       | flag if the source must be converted by babel (default True)
  [ ] | babelize_skip:  | list of modules to be skipped by babel
  [*] | code:           | path to the folder with function's source code
