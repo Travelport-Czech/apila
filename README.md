@@ -130,25 +130,25 @@ known functions are:
 
 Interpret usage
 ---------------
-usage: play [-h] [-V] [--doc] [--debug] [--syntax-check] [-r EVENT] [-u EVENT] [-t TAG] [-e file.yml] [-c file.yml] path
-
-Setup AWS services according to set sequence of tasks.
-
-positional arguments:
-  path                  path to a folder with a AWS service setup file
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -V, --version         show program's version number and exit
-  --doc                 show known commands and exit
-  --debug               on crash show backtrace
-  --syntax-check        perform a syntax check on the playbook, but don't execute it
-  -r EVENT, --register EVENT
-                        explicitly register an event for an execution (can be used more times)
-  -u EVENT, --unregister EVENT
-                        explicitly unregister an event from an actual execution. Actual execution is stored in todo.yml. (can be used more times)
-  -t TAG, --tag TAG     execute only tasks with specified tag (can be used more times)
-  -e file.yml, --exec file.yml
-                        use an alternative filename to task.yml
-  -c file.yml, --conf file.yml
-                        use an alternative filename to config.yml
+    usage: play [-h] [-V] [--doc] [--debug] [--syntax-check] [-r EVENT] [-u EVENT] [-t TAG] [-e file.yml] [-c file.yml] path
+    
+    Setup AWS services according to set sequence of tasks.
+    
+    positional arguments:
+      path                  path to a folder with a AWS service setup file
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -V, --version         show program's version number and exit
+      --doc                 show known commands and exit
+      --debug               on crash show backtrace
+      --syntax-check        perform a syntax check on the playbook, but don't execute it
+      -r EVENT, --register EVENT
+                            explicitly register an event for an execution (can be used more times)
+      -u EVENT, --unregister EVENT
+                            explicitly unregister an event from an actual execution. Actual execution is stored in todo.yml. (can be used more times)
+      -t TAG, --tag TAG     execute only tasks with specified tag (can be used more times)
+      -e file.yml, --exec file.yml
+                            use an alternative filename to task.yml
+      -c file.yml, --conf file.yml
+                            use an alternative filename to config.yml
