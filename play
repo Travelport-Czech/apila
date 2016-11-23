@@ -1,40 +1,44 @@
 #!/usr/bin/env python
 """
 This tool executes sequence of AWS tasks. The sequence is loaded from a file in a given path. Default filename is tasks.yml.
+
 You can find sample script in demo/tasks.yml.
+
 One task can look like this:
-- name: Create something for any reason
-  <task>:
-    task_param: 'some value'
-  tags:
-    - tagname
-  register:
-    - thrown event
-  when:
-    - needed event
+
+    - name: Create something for any reason
+      <task>:
+        task_param: 'some value'
+      tags:
+        - tagname
+      register:
+        - thrown event
+      when:
+        - needed event
 or you can use json syntax (it is compatible with yaml):
-[
-    {
-        "name": "Create something for any reason",
-        "<task>": {
-            "task_param": "some value"
-        },
-        "register": [
-            "thrown event"
-        ],
-        "when": [
-            "needed event"
-        ],
-        "tags": [
-            "tagname"
-        ]
-    }
-]
-attribute name can be used for description of goals and reasons for given task. It's optional. When missing, task will create the name.
-attribute <task> defines action what to do. Tasks can accept their own parameters (see list of known tasks bellow).
-attribute register is a list of events to emit if the task ends with result "created" or "changed"
-attribute when is a list of events for which the task is listening.
-attribute tags is a list of custom tags, you can set some tag at command line, only tasks containing this tag will be executed
+
+    [
+        {
+            "name": "Create something for any reason",
+            "<task>": {
+                "task_param": "some value"
+            },
+            "register": [
+                "thrown event"
+            ],
+            "when": [
+                "needed event"
+            ],
+            "tags": [
+                "tagname"
+            ]
+        }
+    ]
+- attribute name can be used for description of goals and reasons for given task. It's optional. When missing, task will create the name.
+- attribute <task> defines action what to do. Tasks can accept their own parameters (see list of known tasks bellow).
+- attribute register is a list of events to emit if the task ends with result "created" or "changed"
+- attribute when is a list of events for which the task is listening.
+- attribute tags is a list of custom tags, you can set some tag at command line, only tasks containing this tag will be executed
 """
 __version__ = '0.8.19'
 
@@ -58,8 +62,17 @@ class DocAction(argparse.Action):
     tasks.print_doc()
     print "Interpret usage"
     print "---------------"
-    parser.print_help()
+    self.print_indented(parser.format_help())
+    print "Dependencies"
+    print "------------"
+    print " - python 2.7"
+    print " - python module yaml  ( apt-get install python-yaml )"
+    print " - python module boto3 ( apt-get install python-pip; pip install boto3 )"
     parser.exit()
+
+  def print_indented(self, text):
+    for line in text.splitlines():
+      print '   ', line
 
 columns = int(subprocess.check_output(['tput', 'cols']))
 parser = argparse.ArgumentParser(description='Setup AWS services according to set sequence of tasks.', formatter_class=lambda prog: argparse.HelpFormatter(prog, width=columns))

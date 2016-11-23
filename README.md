@@ -184,3 +184,8 @@ Interpret usage
                             use an alternative filename to task.yml
       -c file.yml, --conf file.yml
                             use an alternative filename to config.yml
+Dependencies
+------------
+ - python 2.7
+ - python module yaml  ( apt-get install python-yaml )
+ - python module boto3 ( apt-get install python-pip; pip install boto3 )
