@@ -45,6 +45,7 @@ Known tasks
 -----------
 
 api: Create an api on API gateway
+
 mandatory|parameter|description
 ---|---|---
  [ ] | description:    | short human readable description of the api
@@ -52,6 +53,7 @@ mandatory|parameter|description
 
 
 api-authorizer: Create an authorizer for given api
+
 mandatory|parameter|description
 ---|---|---
  [*] | api:            | name of the api to deploy
@@ -61,6 +63,7 @@ mandatory|parameter|description
 
 
 api-deploy: Deploy an api to given stage
+
 mandatory|parameter|description
 ---|---|---
  [*] | api:            | name of the api to deploy
@@ -68,6 +71,7 @@ mandatory|parameter|description
 
 
 api-resource: Create a resource and a method on Api Gateway
+
 mandatory|parameter|description
 ---|---|---
  [*] | api:            | name of the api
@@ -78,6 +82,7 @@ mandatory|parameter|description
 
 
 api-test: Test an api by simple request
+
 mandatory|parameter|description
 ---|---|---
  [*] | api:            | name of the api
@@ -90,6 +95,7 @@ mandatory|parameter|description
 
 
 dynamo-dump: Dump a table to yaml
+
 mandatory|parameter|description
 ---|---|---
  [*] | dest:           | full name of a target file
@@ -97,6 +103,7 @@ mandatory|parameter|description
 
 
 dynamo-table: Create or remove a table by yaml definition file
+
 mandatory|parameter|description
 ---|---|---
  [*] | name:           | name of the table to be created or removed
@@ -105,12 +112,14 @@ mandatory|parameter|description
 
 
 include: Include tasks from a given tasklist file
+
 mandatory|parameter|description
 ---|---|---
  [*] | source:         | filename of the tasklist
 
 
 json-write: Write data into a JSON encoded file
+
 mandatory|parameter|description
 ---|---|---
  [*] | content:        | structure to be written into the file
@@ -118,6 +127,7 @@ mandatory|parameter|description
 
 
 lambda: Create a lambda function and upload the code from given folder
+
 mandatory|parameter|description
 ---|---|---
  [ ] | babelize:       | flag if the source must be converted by babel (default True)
