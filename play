@@ -30,8 +30,8 @@ or you can use json syntax (it is compatible with yaml):
         ]
     }
 ]
-attribute name can be used for description of goals and reasons for given task. It's optional. When missing, task will create the message.
-attribute <task> defines action what to do. Tasks can accept his own parameters (see list of known tasks bellow).
+attribute name can be used for description of goals and reasons for given task. It's optional. When missing, task will create the name.
+attribute <task> defines action what to do. Tasks can accept their own parameters (see list of known tasks bellow).
 attribute register is a list of events to emit if the task ends with result "created" or "changed"
 attribute when is a list of events for which the task is listening.
 attribute tags is a list of custom tags, you can set some tag at command line, only tasks containing this tag will be executed
