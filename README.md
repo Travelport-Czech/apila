@@ -46,101 +46,101 @@ Known tasks
 
 api: Create an api on API gateway
 
-mandatory|parameter|description
----|---|---
- [ ] | description:    | short human readable description of the api
- [*] | name:           | name of the api (will be concatenated with fields branch and user from config.yml)
+| parameter       |required|description
+|-----------------|--------|-----------
+| description     | no     | short human readable description of the api
+| name            | yes    | name of the api (will be concatenated with fields branch and user from config.yml)
 
 
 api-authorizer: Create an authorizer for given api
 
-mandatory|parameter|description
----|---|---
- [*] | api:            | name of the api to deploy
- [ ] | cache_ttl:      | cache results of authorization for given number of seconds (default is no cache)
- [*] | lambda:         | name of the "gatekeeper" lambda function
- [*] | name:           | name of the authorizer
+| parameter       |required|description
+|-----------------|--------|-----------
+| api             | yes    | name of the api to deploy
+| cache_ttl       | no     | cache results of authorization for given number of seconds (default is no cache)
+| lambda          | yes    | name of the "gatekeeper" lambda function
+| name            | yes    | name of the authorizer
 
 
 api-deploy: Deploy an api to given stage
 
-mandatory|parameter|description
----|---|---
- [*] | api:            | name of the api to deploy
- [*] | stage_name:     | name of the stage
+| parameter       |required|description
+|-----------------|--------|-----------
+| api             | yes    | name of the api to deploy
+| stage_name      | yes    | name of the stage
 
 
 api-resource: Create a resource and a method on Api Gateway
 
-mandatory|parameter|description
----|---|---
- [*] | api:            | name of the api
- [ ] | authorizer:     | name of an authorizer (created by api-authorizer)
- [*] | lambda:         | name of a function called to handle this endpoint
- [*] | method:         | supported HTTP method
- [*] | path:           | name of the resource (path part of an url)
+| parameter       |required|description
+|-----------------|--------|-----------
+| api             | yes    | name of the api
+| authorizer      | no     | name of an authorizer (created by api-authorizer)
+| lambda          | yes    | name of a function called to handle this endpoint
+| method          | yes    | supported HTTP method
+| path            | yes    | name of the resource (path part of an url)
 
 
 api-test: Test an api by simple request
 
-mandatory|parameter|description
----|---|---
- [*] | api:            | name of the api
- [ ] | authorization:  | an authorization token (if request must be authorized)
- [*] | method:         | used HTTP method
- [*] | path:           | the path part of url on the api
- [*] | request:        | sample of payload to be send
- [*] | response:       | expected part of the response
- [*] | stage_name:     | name of the stage
+| parameter       |required|description
+|-----------------|--------|-----------
+| api             | yes    | name of the api
+| authorization   | no     | an authorization token (if request must be authorized)
+| method          | yes    | used HTTP method
+| path            | yes    | the path part of url on the api
+| request         | yes    | sample of payload to be send
+| response        | yes    | expected part of the response
+| stage_name      | yes    | name of the stage
 
 
 dynamo-dump: Dump a table to yaml
 
-mandatory|parameter|description
----|---|---
- [*] | dest:           | full name of a target file
- [*] | name:           | name of the table to be dumped
+| parameter       |required|description
+|-----------------|--------|-----------
+| dest            | yes    | full name of a target file
+| name            | yes    | name of the table to be dumped
 
 
 dynamo-table: Create or remove a table by yaml definition file
 
-mandatory|parameter|description
----|---|---
- [*] | name:           | name of the table to be created or removed
- [*] | source:         | full name of the file with the definition (see demo/sample_reservation.yml)
- [ ] | state:          | table can be in two states: present (it is the default state) or absent
+| parameter       |required|description
+|-----------------|--------|-----------
+| name            | yes    | name of the table to be created or removed
+| source          | yes    | full name of the file with the definition (see demo/sample_reservation.yml)
+| state           | no     | table can be in two states: present (it is the default state) or absent
 
 
 include: Include tasks from a given tasklist file
 
-mandatory|parameter|description
----|---|---
- [*] | source:         | filename of the tasklist
+| parameter       |required|description
+|-----------------|--------|-----------
+| source          | yes    | filename of the tasklist
 
 
 json-write: Write data into a JSON encoded file
 
-mandatory|parameter|description
----|---|---
- [*] | content:        | structure to be written into the file
- [*] | dest:           | full name of the target file
+| parameter       |required|description
+|-----------------|--------|-----------
+| content         | yes    | structure to be written into the file
+| dest            | yes    | full name of the target file
 
 
 lambda: Create a lambda function and upload the code from given folder
 
-mandatory|parameter|description
----|---|---
- [ ] | babelize:       | flag if the source must be converted by babel (default True)
- [ ] | babelize_skip:  | list of modules to be skipped by babel
- [*] | code:           | path to the folder with function's source code
- [ ] | description:    | short description of the function
- [*] | handler:        | entrypoint to the function code
- [ ] | memory_size:    | amount of memory reserved for the execution of the function
- [*] | name:           | function name
- [ ] | publish:        | I'm not sure, give always True ;-)
- [*] | role:           | name of a role for the execution of the function
- [*] | runtime:        | name and a version of interpret for the execution i.e.: 'nodejs4.3'
- [ ] | timeout:        | maximal time for the execution of the function
+| parameter       |required|description
+|-----------------|--------|-----------
+| babelize        | no     | flag if the source must be converted by babel (default True)
+| babelize_skip   | no     | list of modules to be skipped by babel
+| code            | yes    | path to the folder with function's source code
+| description     | no     | short description of the function
+| handler         | yes    | entrypoint to the function code
+| memory_size     | no     | amount of memory reserved for the execution of the function
+| name            | yes    | function name
+| publish         | no     | I'm not sure, give always True ;-)
+| role            | yes    | name of a role for the execution of the function
+| runtime         | yes    | name and a version of interpret for the execution i.e.: 'nodejs4.3'
+| timeout         | no     | maximal time for the execution of the function
 
 
 Functions in tasks
