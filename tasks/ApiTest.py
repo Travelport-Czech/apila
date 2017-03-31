@@ -59,21 +59,32 @@ class ApiTest(Task):
     else:
       return (False, 'Tested method must be POST or GET')
     response = r.json()
-    match = self.dictMatch(self.params['response'], response)
+    match = self.anyMatch(self.params['response'], response)
     if match:
       return (True, '')
     else:
       return (False, 'Response %s not contain expected %s' % (str(response), self.params['response']))
 
+  def anyMatch(self, patn, real):
+    if type(patn) == dict and type(real) == dict:
+        return self.dictMatch(patn, real)
+    elif type(patn) == list and type(real) == list:
+        return self.listMatch(patn, real)
+    else:
+        return str(patn) == str(real)
+
+  def listMatch(self, patn, real):
+    for patn_item in patn:
+        found = False
+        for real_item in real:
+            if self.anyMatch(patn_item, real_item):
+                found = True
+        if not found:
+            return False
+    return True
+
   def dictMatch(self, patn, real):
-    """does real dict match pattern?"""
-    try:
-        for pkey, pvalue in patn.iteritems():
-            if type(pvalue) is dict:
-                result = dictMatch(pvalue, real[pkey])
-            else:
-                assert real[pkey] == pvalue
-                result = True
-    except (AssertionError, KeyError):
-        result = False
-    return result
+    for pkey, pvalue in patn.iteritems():
+        if pkey not in real or not self.anyMatch(pvalue, real[pkey]):
+            return False
+    return True
