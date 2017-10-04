@@ -50,6 +50,7 @@ import os
 import subprocess
 import tasks.task_runner
 import logging
+import tasks.AwsSession
 
 class DocAction(argparse.Action):
   def __init__(self, option_strings, dest=argparse.SUPPRESS, help=""):
@@ -95,6 +96,18 @@ os.chdir(args.path)
 tasks_filename = args.entry_point if args.entry_point else 'tasks.yml'
 default_conf_filename = 'config.yml'
 
+if os.path.exists('.aws_session'):
+  aws_session_data = yaml.load(open('.aws_session').read())
+else:
+  aws_session_data = dict()
+  
+aws_session = tasks.AwsSession.AwsSession(aws_session_data.get("serial_number", ""), 
+                                          aws_session_data.get("secret_access_key", ""), 
+                                          aws_session_data.get("session_token", ""), 
+                                          aws_session_data.get("access_key_id", ""))
+aws_session.validate()
+open('.aws_session', 'w').write(yaml.dump(aws_session.get_data_dict(), default_flow_style=False))
+
 print "Processing content of %s executing %s ..." % (os.getcwd(), tasks_filename)
 
 conf_filename = args.conf if args.conf else default_conf_filename
@@ -126,7 +139,7 @@ if args.syntax_check:
   sys.exit(0)
 
 cache = tasks.Cache()
-clients = tasks.Clients()
+clients = tasks.Clients(aws_session)
 
 if os.path.exists('todo.yml'):
   todo = set(yaml.load(open('todo.yml').read()))

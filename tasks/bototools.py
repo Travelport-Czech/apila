@@ -1,5 +1,12 @@
 import botocore
 
+def is_api_request_available(client):
+  try:
+    client.get_rest_apis(limit = 1)
+    return True
+  except Exception:
+    return False
+
 def get_api_if_exists(client, name):
   apis = client.get_rest_apis(limit=500)
   for api in apis['items']:
@@ -72,3 +79,9 @@ def get_authorizer_by_name(client, api_id, authorizer_name):
     return authorizers[0]
   else:
     return None
+
+def get_session(client, serial_number, token_code):
+  return client.get_session_token(
+    SerialNumber = serial_number,
+    TokenCode = token_code
+  )

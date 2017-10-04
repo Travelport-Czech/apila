@@ -1,4 +1,5 @@
 import boto3
+import AwsSession
 from task_factory import known_tasks, get_yaml_tags_constructors, create_task
 
 def print_doc():
@@ -25,12 +26,19 @@ known functions are:
   print
 
 class Clients:
-  def __init__(self):
+  def __init__(self, aws_session):
     self.cache = {}
+    self.aws_session = aws_session
 
   def get(self, name):
     if name not in self.cache:
-      self.cache[name] = boto3.client(name)
+      if self.aws_session.is_timed_session():
+        self.cache[name] = boto3.client(name, 
+                                        aws_access_key_id = self.aws_session.access_key_id,
+                                        aws_secret_access_key = self.aws_session.secret_access_key,
+                                        aws_session_token = self.aws_session.session_token)
+      else:
+        self.cache[name] = boto3.client(name)
     return self.cache[name]
 
 class Cache:
