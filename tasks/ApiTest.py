@@ -10,6 +10,7 @@ class ApiTest(Task):
   known_params = {
     'api': 'name of the api',
     'path': 'the path part of url on the api',
+    'placeholders': 'placeholders in path',
     'method': 'used HTTP method',
     'stage_name': 'name of the stage',
     'request': 'sample of payload to be send',
@@ -31,6 +32,7 @@ class ApiTest(Task):
     api_name = name_constructor.api_name(self.params['api'], self.config['user'], self.config['branch'])
     path = self.params['path']
     method = self.params['method']
+    placeholders = self.params.get('placeholders', {})
     client = clients.get('apigateway')
     api_id = bototools.get_cached_api_id_if_exists(client, cache, api_name)
     if api_id is None:
@@ -47,7 +49,7 @@ class ApiTest(Task):
       'api_id': api_id,
       'region': region,
       'stage': self.params['stage_name'],
-      'path': path
+      'path': path.format(**placeholders)
     }
     headers = {}
     if 'authorization' in self.params:
