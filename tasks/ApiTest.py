@@ -3,6 +3,7 @@ import bototools
 import name_constructor
 import requests
 import json
+from urllib import urlencode
 
 class ApiTest(Task):
   """Test an api by simple request"""
@@ -11,6 +12,7 @@ class ApiTest(Task):
     'api': 'name of the api',
     'path': 'the path part of url on the api',
     'placeholders': 'placeholders in path',
+    'query' : 'query parameters',
     'method': 'used HTTP method',
     'stage_name': 'name of the stage',
     'request': 'sample of payload to be send',
@@ -33,6 +35,7 @@ class ApiTest(Task):
     path = self.params['path']
     method = self.params['method']
     placeholders = self.params.get('placeholders', {})
+    queries = self.params.get('query', {})
     client = clients.get('apigateway')
     api_id = bototools.get_cached_api_id_if_exists(client, cache, api_name)
     if api_id is None:
@@ -45,11 +48,12 @@ class ApiTest(Task):
 # arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:860303221267:function:main_srb_afd_attemptEvaluate/invocations
     method_uri = method_info['methodIntegration']['uri']
     region = method_uri.split(':')[3]
-    url_to_test = 'https://%(api_id)s.execute-api.%(region)s.amazonaws.com/%(stage)s%(path)s' % {
+    url_to_test = 'https://%(api_id)s.execute-api.%(region)s.amazonaws.com/%(stage)s%(path)s%(query)s' % {
       'api_id': api_id,
       'region': region,
       'stage': self.params['stage_name'],
-      'path': path.format(**placeholders)
+      'path': path.format(**placeholders),
+      'query': ('?' + urlencode(queries)) if queries else ''
     }
     headers = {}
     if 'authorization' in self.params:

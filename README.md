@@ -90,6 +90,7 @@ api-test: Test an api by simple request
 | method          | yes    | used HTTP method
 | path            | yes    | the path part of url on the api
 | placeholders    | no     | values for placeholders to be replaced in path
+| query           | no     | query parameters to be added to url
 | request         | yes    | sample of payload to be send
 | response        | yes    | expected part of the response
 | stage_name      | yes    | name of the stage
