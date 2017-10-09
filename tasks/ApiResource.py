@@ -10,6 +10,7 @@ class ApiResource(Task):
     'api': 'name of the api',
     'path': 'name of the resource (path part of an url)',
     'method': 'supported HTTP method',
+    'integration_method': 'method for lambda integration, POST is recomended by aws documentation',
     'lambda': 'name of a function called to handle this endpoint',
     'authorizer': 'name of an authorizer (created by api-authorizer)'
   }
@@ -98,7 +99,8 @@ class ApiResource(Task):
     self.create_integration(client, api_id, path_id, lambda_arn)
 
   def create_integration(self, client, api_id, path_id, lambda_arn):
-    client.put_integration(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], type='AWS_PROXY', uri=lambda_arn, integrationHttpMethod=self.params['method'])
+    integration_method = self.params['integration_method'] if self.params['integration_method'] else self.params['method']
+    client.put_integration(restApiId=api_id, resourceId=path_id, httpMethod=self.params['method'], type='AWS_PROXY', uri=lambda_arn, integrationHttpMethod=integration_method)
     
   def add_permission(self, client, lambda_name, permissions_arn, uuid):
     result = client.add_permission(FunctionName=lambda_name, StatementId=uuid, Action="lambda:InvokeFunction", Principal="apigateway.amazonaws.com", SourceArn=permissions_arn)
