@@ -77,8 +77,9 @@ class Lambda(Task):
       os.chdir(base_path)
     preset_base = os.getcwd()
     try:
-      babel_out = subprocess.check_output(' '.join(['node_modules/.bin/babel', '--presets', os.path.join(preset_base, 'node_modules', 'babel-preset-es2015-node4'), '--copy-files', '--out-dir', babelized_dir, clean_dir]), stderr=subprocess.STDOUT, shell=True)
+      babel_out = subprocess.check_output(' '.join(['node_modules/.bin/babel', '--no-babelrc --presets', os.path.join(preset_base, 'node_modules', 'babel-preset-es2015-node4'), '--copy-files', '--out-dir', babelized_dir, clean_dir]), stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError as e:
+      logging.error('cwd: '+os.getcwd())
       logging.error(e.output)
       raise e
     finally:
