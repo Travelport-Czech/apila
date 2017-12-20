@@ -124,7 +124,8 @@ class Lambda(Task):
     else:
       files = self.get_files(os.path.join(clean_dir, 'app'), '') + self.get_files(clean_dir, 'node_modules')
     self.clean_packages(files, work_dir)
-    zip_data = self.create_zip(files)
+    files_to_zip = [file_name for file_name in files if not file_name[0].endswith('.SAMPLE')]
+    zip_data = self.create_zip(files_to_zip)
     shutil.rmtree(work_dir)
     return zip_data
 
