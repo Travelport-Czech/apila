@@ -62,8 +62,10 @@ class ApiTest(Task):
       r = requests.post(url_to_test, data=self.params['request'], headers=headers)
     elif method == 'GET':
       r = requests.get(url_to_test, params=self.params['request'], headers=headers)
+    elif method == 'DELETE':
+      r = requests.delete(url_to_test, params=self.params['request'], headers=headers)
     else:
-      return (False, 'Tested method must be POST or GET')
+      return (False, 'Tested method must be POST, GET nebo DELETE')
     response = r.json()
     match = self.anyMatch(self.params['response'], response)
     if match:
